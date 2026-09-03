@@ -1,0 +1,157 @@
+# ============================================================
+# 《前沿模型风险评估技术》文献清单（全链路唯一事实源）
+# 版本：完全核实版（13 条，FR01–FR13 连续编号）
+# - arXiv /html/ 全文页统一规范为 /abs/ 摘要页
+# - 同一成果的多个官方入口用 related_urls 一并抓取（如 FR07 的 MIT 官方站 + arXiv）
+# - 抓取失败会生成占位 md，按其中“原始链接”手工补正文即可
+# ============================================================
+
+literatures:
+  # ---------------- 第一章 ----------------
+  - id: "FR01"
+    title: "Evaluating Large Language Models in Cybersecurity: A Systematic Review"
+    url: "https://www.scilit.com/publications/31ad8ac0091d4a000db5b5759a417050"
+    publisher: "Scilit（SoK 系统综述索引）"
+    date: ""
+    lit_type: "系统性综述（SoK）"
+    credibility: "高（系统性综述）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.1"
+    tags: ["LLM安全", "网络安全", "系统综述", "动态评测演进"]
+
+  - id: "FR02"
+    title: "Artificial Intelligence Risk Management Framework (AI RMF 1.0)"
+    url: "https://www.nist.gov/itl/ai-risk-management-framework"
+    publisher: "NIST（美国国家标准与技术研究院）"
+    date: ""
+    lit_type: "官方风险管理框架"
+    credibility: "高（官方治理框架）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.2"
+    tags: ["NIST AI RMF", "风险度量", "安全对齐", "合规评估", "风险缓释"]
+
+  - id: "FR03"
+    title: "Frontier AI Trends Report"
+    url: "https://www.aisi.gov.uk/frontier-ai-trends-report"
+    publisher: "UK AI Safety Institute"
+    date: ""
+    lit_type: "官方趋势评估报告"
+    credibility: "高（官方机构报告）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.3"
+    tags: ["前沿AI趋势", "极端风险评测", "突变能力", "安全底线"]
+
+  # ---------------- 第二章 ----------------
+  - id: "FR04"
+    title: "Model evaluation for extreme risks"
+    url: "https://arxiv.org/abs/2305.15324"
+    publisher: "arXiv（DeepMind 等）"
+    date: "2023-05"
+    lit_type: "奠基性学术论文"
+    credibility: "高（奠基性论文）"
+    chapter: "02-技术内涵与评估机理"
+    section: "2.1"
+    tags: ["极端风险评估", "前沿模型评估", "红队测试", "风险边界", "评估范式奠基"]
+
+  - id: "FR05"
+    title: "前沿人工智能风险管理框架：风险评测实践报告（部署环境-威胁源-使能能力 E-T-C 模型）"
+    url: "https://concordia-ai.com/zh-hans/research/frontier-ai-risk-management-framework-in-practice-a-risk-analysis-technical-report/"
+    publisher: "上海人工智能实验室 / 安远AI（Concordia AI）"
+    date: ""
+    lit_type: "研究机构实践报告"
+    credibility: "高（研究机构实践报告）"
+    chapter: "02-技术内涵与评估机理"
+    section: "2.2"
+    tags: ["E-T-C模型", "部署环境", "威胁源", "使能能力", "实证评估框架"]
+
+  - id: "FR06"
+    title: "Documented AI Agent Incidents（METR 智能体风险量化评估规范）"
+    url: "https://metr.org/agent-incidents/"
+    publisher: "METR（Model Evaluation and Threat Research）"
+    date: ""
+    lit_type: "安全事件记录与量化指标体系"
+    credibility: "高（专业评测机构）"
+    chapter: "02-技术内涵与评估机理"
+    section: "2.3"
+    tags: ["AI Agent事件", "长周期自主性", "风险量化指标", "评估规范"]
+
+  - id: "FR07"
+    title: "The 2025 AI Agent Index: Documenting Technical and Safety Disclosures（ACM FAccT）"
+    url: "https://aiagentindex.mit.edu/"
+    related_urls:
+      - "https://arxiv.org/abs/2602.17753"
+    publisher: "MIT / 剑桥等（ACM FAccT）"
+    date: "2026-02"
+    lit_type: "学术研究报告（官方项目站+论文）"
+    credibility: "高（学术研究）"
+    chapter: "02-技术内涵与评估机理"
+    section: "2.4"
+    tags: ["安全清洗", "safety washing", "智能体披露", "评测污染", "FAccT"]
+
+  # ---------------- 第三章 ----------------
+  - id: "FR08"
+    title: "The Role of Risk Modeling in Advanced AI Risk Management"
+    url: "https://arxiv.org/abs/2512.08723"
+    publisher: "arXiv"
+    date: "2025-12"
+    lit_type: "学术论文（技术路线综述）"
+    credibility: "高（学术论文）"
+    chapter: "03-技术演进与产业动态"
+    section: "3.1"
+    tags: ["风险建模", "故障树", "沙盒行为因果建模", "系统安全工程", "静态数据集局限"]
+
+  - id: "FR09"
+    title: "Measuring Reliability and Security of Agentic Code Generation"
+    url: "https://arxiv.org/abs/2608.14711"
+    publisher: "arXiv"
+    date: "2026-08"
+    lit_type: "学术论文（标志性实证测评）"
+    credibility: "高（学术论文）"
+    chapter: "03-技术演进与产业动态"
+    section: "3.2"
+    tags: ["代码供应链安全", "智能体代码生成", "沙盒红队对抗", "可靠性测评", "网络能力基准"]
+
+  - id: "FR10"
+    title: "Emerging Security Practices for AI Agents"
+    url: "https://www.frontiermodelforum.org/issue-briefs/emerging-security-practices-for-ai-agents/"
+    publisher: "Frontier Model Forum（FMF）"
+    date: ""
+    lit_type: "行业官方指南（Issue Brief）"
+    credibility: "高（行业官方指南）"
+    chapter: "03-技术演进与产业动态"
+    section: "3.3"
+    tags: ["自动化红队工具链", "输入审计", "推理审计", "第三方安全审计", "产业生态"]
+
+  # ---------------- 第四章 ----------------
+  - id: "FR11"
+    title: "Agent Evaluation: From “Did It Answer?” to “Can I Trust It in the Loop”"
+    url: "https://medium.com/codex/agent-evaluation-from-did-it-answer-to-can-i-trust-it-in-the-loop-a2ed0f35f800"
+    publisher: "Medium / Codex"
+    date: ""
+    lit_type: "技术实践指南"
+    credibility: "中（技术博客）"
+    chapter: "04-应用前景与战略价值"
+    section: "4.1"
+    tags: ["全生命周期", "动态信任", "生产环境调用拦截", "部署后动态监控", "运行时评测"]
+
+  - id: "FR12"
+    title: "AutoMAEC: an automated framework for semantic-aware analysis in sandboxes"
+    url: "https://link.springer.com/article/10.1186/s44147-026-01093-5"
+    publisher: "Springer（期刊论文）"
+    date: "2026"
+    lit_type: "同行评议期刊论文"
+    credibility: "高（期刊论文）"
+    chapter: "04-应用前景与战略价值"
+    section: "4.2"
+    tags: ["沙盒日志", "语义感知抽象", "对抗攻击", "鲁棒性反哺", "自动化分析框架"]
+
+  - id: "FR13"
+    title: "A Frontier AI Risk Management Framework: Bridging the Gap Between Current AI Practices and Established Risk Management"
+    url: "https://arxiv.org/abs/2502.06656"
+    publisher: "arXiv"
+    date: "2025-02"
+    lit_type: "学术论文（战略框架）"
+    credibility: "高（学术论文）"
+    chapter: "04-应用前景与战略价值"
+    section: "4.3"
+    tags: ["双用途风险", "高危行业类比", "核能航空风险管理", "关键基础设施", "国家级安全防线"]

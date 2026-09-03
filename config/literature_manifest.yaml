@@ -1,0 +1,190 @@
+# ============================================================
+# 《大模型低精度计算技术》文献清单（单源平铺版）
+# 版本：v1.2
+# 变更说明：
+#   1) 移除原面向AI的新型数据库技术全部文献
+#   2) 独立为大模型低精度计算技术专题，保留16篇核心领域文献
+#   3) 文献重新编号为LBQ01~LBQ16，对应四章结构
+#   4) 修正LBQ02文献指向，替换为NVIDIA TensorRT量化技术具体官方文章，明确引用范围
+#   5) 修正LBQ15文献指向，明确为高通研究官网端侧AI专题板块，替代原模糊白皮书指向
+# ============================================================
+literatures:
+  # ---------------- 第一章：遴选理由与核心价值 ----------------
+  - id: "LBQ01"
+    title: "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models"
+    url: "https://arxiv.org/abs/2211.10438"
+    publisher: "arXiv / ICML 2023"
+    date: "2022-11"
+    lit_type: "训练后量化技术里程碑论文"
+    credibility: "高（MIT与NVIDIA联合提出W8A8量化范式，解决激活离群点难题，领域经典成果）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.1"
+    tags: ["SmoothQuant", "训练后量化", "W8A8", "激活离群点", "INT8量化"]
+
+  - id: "LBQ02"
+    title: "Model Quantization: Turn FP8 Checkpoints into High-Performance Inference Engines with NVIDIA TensorRT"
+    url: "https://developer.nvidia.com/blog/model-quantization-turn-fp8-checkpoints-into-high-performance-inference-engines-with-nvidia-tensorrt"
+    publisher: "NVIDIA官方技术博客"
+    date: "2026-06"
+    lit_type: "TensorRT量化技术官方工程指南"
+    credibility: "高（NVIDIA官方发布，系统讲解FP8量化checkpoint转换、推理引擎构建与Hopper/Blackwell硬件加速实现，是企业级量化部署的权威工程指南）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.1"
+    tags: ["NVIDIA TensorRT", "FP8量化", "推理引擎", "硬件加速", "工程落地"]
+
+  - id: "LBQ03"
+    title: "Green AI"
+    url: "https://arxiv.org/abs/1907.10597"
+    publisher: "arXiv"
+    date: "2019-07"
+    lit_type: "绿色AI能效研究经典论文"
+    credibility: "高（系统提出AI算力能效评估框架，定义绿色AI核心评价指标）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.2"
+    tags: ["绿色AI", "能效评估", "算力成本", "可持续AI"]
+
+  - id: "LBQ04"
+    title: "A Survey of Low-bit Large Language Models: Basics, Systems, and Algorithms"
+    url: "https://arxiv.org/abs/2409.16694"
+    publisher: "arXiv"
+    date: "2024-09"
+    lit_type: "低比特大模型系统性综述"
+    credibility: "高（北航/中科院团队联合撰写，覆盖基础原理、系统实现与算法策略全维度）"
+    chapter: "01-遴选理由与核心价值"
+    section: "1.3"
+    tags: ["低比特量化", "大模型", "量化系统", "算法综述", "推理优化"]
+
+  # ---------------- 第二章：技术内涵与核心机理 ----------------
+  - id: "LBQ05"
+    title: "ISO/IEC 22989:2022 Artificial intelligence — Concepts and terminology"
+    url: "https://www.iso.org/standard/74296.html"
+    publisher: "国际标准化组织（ISO/IEC）"
+    date: "2022"
+    lit_type: "AI领域国际术语标准"
+    credibility: "高（官方标准，定义AI领域核心概念与术语规范）"
+    chapter: "02-技术内涵与核心机理"
+    section: "2.1"
+    tags: ["AI术语", "国际标准", "概念定义", "标准化"]
+
+  - id: "LBQ06"
+    title: "TensorRT-LLM Official Quantization Guide"
+    url: "https://github.com/NVIDIA/TensorRT-LLM"
+    publisher: "NVIDIA官方技术文档"
+    date: "持续更新"
+    lit_type: "企业级推理框架量化官方指南"
+    credibility: "高（NVIDIA官方定义，明确各精度量化实现、混合精度推理标准与技术边界）"
+    chapter: "02-技术内涵与核心机理"
+    section: "2.2"
+    tags: ["TensorRT-LLM", "推理框架", "量化实现", "企业级", "技术规范"]
+
+  - id: "LBQ07"
+    title: "vLLM Quantization Support and Architecture Documentation"
+    url: "https://docs.vllm.ai/"
+    publisher: "vLLM官方文档"
+    date: "2026-04"
+    lit_type: "开源推理框架量化架构文档"
+    credibility: "高（UC Berkeley发起开源项目，系统覆盖多类型量化支持与推理优化架构）"
+    chapter: "02-技术内涵与核心机理"
+    section: "2.2"
+    tags: ["vLLM", "推理框架", "量化支持", "开源", "PagedAttention"]
+
+  - id: "LBQ08"
+    title: "MLPerf Inference Benchmarks"
+    url: "https://mlcommons.org/benchmarks/inference"
+    publisher: "MLCommons"
+    date: "持续更新"
+    lit_type: "AI推理性能国际基准测试"
+    credibility: "中（行业通用基准体系，覆盖不同精度、不同硬件的推理性能评测）"
+    chapter: "02-技术内涵与核心机理"
+    section: "2.3"
+    tags: ["MLPerf", "推理基准", "性能评测", "行业标准"]
+
+  # ---------------- 第三章：全球最新进展与产业动态 ----------------
+  - id: "LBQ09"
+    title: "QLoRA: Efficient Finetuning of Quantized LLMs"
+    url: "https://arxiv.org/abs/2305.14314"
+    publisher: "arXiv / NeurIPS 2023"
+    date: "2023-05"
+    lit_type: "量化微调技术里程碑论文"
+    credibility: "高（提出NF4数据类型与双重量化，实现单卡48GB微调65B模型，领域标杆成果）"
+    chapter: "03-全球最新进展与产业动态"
+    section: "3.1"
+    tags: ["QLoRA", "量化微调", "NF4", "LoRA", "低资源微调"]
+
+  - id: "LBQ10"
+    title: "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration"
+    url: "https://arxiv.org/abs/2306.00978"
+    publisher: "arXiv / MLSys 2024"
+    date: "2023-06"
+    lit_type: "激活感知权重量化技术论文"
+    credibility: "高（MLSys 2024最佳论文，提出激活感知量化策略，硬件友好度优异）"
+    chapter: "03-全球最新进展与产业动态"
+    section: "3.1"
+    tags: ["AWQ", "激活感知量化", "模型压缩", "推理加速", "端侧部署"]
+
+  - id: "LBQ11"
+    title: "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers"
+    url: "https://arxiv.org/abs/2210.17323"
+    publisher: "arXiv / ICLR 2023"
+    date: "2022-10"
+    lit_type: "生成式模型训练后量化经典论文"
+    credibility: "高（基于近似二阶信息的3/4-bit权重量化方法，训练后量化领域主流基准）"
+    chapter: "03-全球最新进展与产业动态"
+    section: "3.2"
+    tags: ["GPTQ", "训练后量化", "4-bit量化", "生成式模型", "误差校准"]
+
+  - id: "LBQ12"
+    title: "The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits"
+    url: "https://arxiv.org/abs/2402.17764"
+    publisher: "arXiv"
+    date: "2024-02"
+    lit_type: "1比特大模型里程碑研究"
+    credibility: "高（微软研究院提出BitNet b1.58三值量化范式，开创1比特大模型技术路线）"
+    chapter: "03-全球最新进展与产业动态"
+    section: "3.2"
+    tags: ["1-bit量化", "BitNet", "三值权重", "极致压缩", "能效比"]
+
+  - id: "LBQ13"
+    title: "BitNet b1.58 2B4T Technical Report"
+    url: "https://arxiv.org/abs/2504.12285"
+    publisher: "arXiv"
+    date: "2025-04"
+    lit_type: "原生1比特大模型技术报告"
+    credibility: "高（首个开源原生1-bit 2B参数模型，4T tokens训练，实证1比特模型性能追平全精度）"
+    chapter: "03-全球最新进展与产业动态"
+    section: "3.2"
+    tags: ["BitNet", "原生1-bit", "开源模型", "技术实证", "2B参数"]
+
+  - id: "LBQ14"
+    title: "Hugging Face Transformers Quantization Guide"
+    url: "https://huggingface.co/docs/transformers/main/en/quantization"
+    publisher: "Hugging Face官方文档"
+    date: "持续更新"
+    lit_type: "开源模型生态量化工具指南"
+    credibility: "中（主流开源模型生态官方量化工具，覆盖多类型量化方法与模型适配）"
+    chapter: "03-全球最新进展与产业动态"
+    section: "3.3"
+    tags: ["Hugging Face", "Transformers", "量化工具", "开源生态", "模型适配"]
+
+  # ---------------- 第四章：应用前景与多维价值评估 ----------------
+  - id: "LBQ15"
+    title: "Qualcomm On-Device AI & Generative AI Research Portfolio"
+    url: "https://www.qualcomm.com/research"
+    publisher: "Qualcomm Technologies Research"
+    date: "持续更新"
+    lit_type: "端侧AI技术官方研究专题"
+    credibility: "中（高通官方研究板块，系统梳理Snapdragon平台端侧生成式AI技术路线、模型量化优化与终端落地实践体系）"
+    chapter: "04-应用前景与多维价值评估"
+    section: "4.1"
+    tags: ["端侧AI", "高通", "Snapdragon", "边缘计算", "生成式AI", "模型量化"]
+
+  - id: "LBQ16"
+    title: "IEA Data Centres and AI Energy Consumption Analysis"
+    url: "https://www.iea.org/"
+    publisher: "国际能源署（IEA）"
+    date: "持续更新"
+    lit_type: "数据中心与AI能耗权威分析报告"
+    credibility: "高（权威能源机构发布，系统分析AI算力能耗趋势与数据中心能效现状）"
+    chapter: "04-应用前景与多维价值评估"
+    section: "4.2"
+    tags: ["IEA", "数据中心", "AI能耗", "能效分析", "碳足迹"]
