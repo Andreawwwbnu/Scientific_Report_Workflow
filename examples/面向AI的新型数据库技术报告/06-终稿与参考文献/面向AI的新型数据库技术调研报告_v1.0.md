@@ -1,0 +1,111 @@
+---
+报告名称: 面向AI的新型数据库技术调研报告
+版本: v1.0
+发布日期: '2026-08-31'
+文献库唯一文献数量: 16篇
+主题分类: AI原生数据库; 向量数据库; 智能数据库; 向量检索; 数据库调优; 生成式数据库
+适用对象: 数据库研发工程师; AI系统架构师; 技术战略人员; 产业投资分析师; 数据库运维人员
+生成时间: '2026-08-31 15:42:04'
+---
+
+# 面向AI的新型数据库技术调研报告
+
+## 摘要
+
+传统数据库基于专家经验的优化范式已难以满足异构数据、海量应用与大规模用户的性能需求，数据库技术正由“存”向“智”发生根本性转变。本报告系统梳理面向AI的新型数据库技术体系：在技术内涵层面，阐明向量数据库与AI原生数据库的概念边界，揭示“索引即模型”的底层机理，剖析查询感知调优、学习索引与混合查询执行等关键技术特征；在最新进展层面，综述GenSQL概率编程系统、AnDB统一语义分析框架、Text2VectorSQL接口统一及SPANN十亿级向量检索等近三年里程碑成果；在应用前景层面，分析RAG工程链路与智能诊断运维等典型场景的多维价值。研究表明，AI与数据库已形成双向赋能格局，向量数据库成为AI时代关键基础设施，存储索引层已具备十亿级毫秒检索能力，而查询接口可靠性仍待补强，产业格局重塑为国产数据库提供历史性机遇。
+
+## 关键词
+
+AI原生数据库；向量数据库；学习索引；查询感知调优；检索增强生成；数据库智能体；混合查询
+
+## 一、遴选理由
+
+面向AI的新型数据库技术入选前沿技术方向，根因在于传统优化范式已无法应对当前数据与负载的复杂度。传统数据库的代价估计、连接顺序选择与参数调优依赖专家经验，难以满足异构数据、海量应用和大规模用户的性能需求，基于学习的优化技术成为使数据库更智能的核心路径<sup>[AIDB02]</sup>。AI与数据库的关系由此从工具调用升级为双向赋能：AI4DB以学习型配置调优、优化器、索引顾问与安全机制提升数据库智能水平，DB4AI则以声明式语言、数据治理及训练推理加速反向优化AI模型<sup>[AIDB01]</sup>。这一转变体现为三个能力跃迁——从“被动存储”到“主动理解”、从“精确匹配”到“相似性推理”、从“单一模态”到“跨模态关联”<sup>[AIDB04][AIDB05]</sup>。轩辕数据库已实现自配置、自优化、自监控、自诊断、自愈、自安全与自组装服务，并将AI原生数据库划分为AI建议型至AI自设计型五个演进层次<sup>[AIDB02]</sup>。
+
+该技术的战略价值首先体现为应对大语言模型系统性缺陷的基础层方案。大语言模型面临幻觉、知识过时、商业应用成本高昂与记忆问题，向量数据库通过高效存储、检索和管理高维向量表示成为有效解决方案<sup>[AIDB03]</sup>。随着文本、图像、音视频等非结构化数据爆炸式增长，高效存储与利用这些数据已成为影响AI发展的关键举措<sup>[AIDB04][AIDB05]</sup>。在AI原生数据库产品体系中，向量数据库、多模融合与混合检索共同构成底层能力基座<sup>[AIDB04][AIDB05]</sup>。
+
+近三年，大模型落地瓶颈构成首要外部需求动力，推动向量数据库完成基础设施化跃迁<sup>[AIDB03]</sup>；AI能力由外挂走向内嵌，数据库智能体（DB Agent）将复杂运维、开发与治理工作封装为自然语言交互，大幅降低使用门槛<sup>[AIDB04][AIDB05]</sup>。上述变革最终重塑全球数据库产业格局，为国产数据库提供“换道超车”的历史性机遇<sup>[AIDB04][AIDB05]</sup>，技术前景广阔。
+
+## 二、技术内涵
+
+### 2.1 概念定义与技术边界
+
+向量数据库与AI原生数据库在概念边界上存在明确定位差异。向量数据库管理系统（VDBMSs）是以快速准确向量搜索为核心目标的专门化系统，其发展源于LLM与电子商务应用对密集检索的需求<sup>[AIDB07]</sup>；AI原生数据库则是在数据库系统内集成面向AI工作负载的向量检索能力，Oracle AI Vector Search即存储并索引向量嵌入，用于快速检索和相似性搜索，并允许查询数据库<sup>[AIDB06]</sup>。
+
+原生支持向量数据类型是AI原生数据库在数据层的直接体现。Oracle AI Vector Search提供VECTOR数据类型，将非结构化数据经嵌入模型转换为向量嵌入，用于业务数据语义查询，使用该类型要求COMPATIBLE初始化参数不低于23.4.0<sup>[AIDB06]</sup>。在向量数据类型之上，混合查询处理构成查询执行层的核心机制，VDBMSs需处理计划枚举、计划选择及谓词或“混合”查询算子，将向量相似性搜索与谓词条件统一执行<sup>[AIDB07]</sup>。
+
+内生AI算子体现为AI模型直接取代数据库核心组件而非外部附加功能。索引本质上是将键映射到记录位置的模型，所有现有索引结构可被深度学习等模型替代为学习索引<sup>[AIDB08]</sup>；数据库调优环节同样可由深度强化学习模型内嵌实现，QTune即采用DRL模型进行查询感知的配置调优<sup>[AIDB09]</sup>。
+
+### 2.2 底层机理与运行逻辑
+
+向量化是向量数据库接收数据的入口机制。Oracle AI Vector Search通过内建VECTOR数据类型将非结构化数据经嵌入模型转换为向量嵌入，从而在数据库内以向量形式支撑语义查询，其部署条件被显式限定为COMPATIBLE参数不低于23.4.0<sup>[AIDB06]</sup>。
+
+索引构建的底层机理可统一描述为“索引即模型”。B-tree、哈希、位图等传统结构分别可视为键到排序数组、未排序数组、存在性标志的映射模型，因此一切索引均可被包括深度学习在内的其他模型替代，且学习索引对传统索引的优势条件在理论上可分析<sup>[AIDB08]</sup>。向量数据库管理系统的索引工程需同时处理索引设计、搜索与维护三个维度<sup>[AIDB07]</sup>。
+
+检索与结果融合由查询优化与执行技术承载。系统通过计划枚举与计划选择确定查询方案，以谓词或“混合”查询算子协同处理向量相似度匹配与结构化条件过滤，并可通过硬件加速支撑执行<sup>[AIDB07]</sup>。运行逻辑中还存在查询感知的配置调优闭环：QTune以深度强化学习为核心，先将SQL查询特征化后输入DRL模型，再由双状态DDPG借助actor-critic网络基于查询向量与数据库状态选择配置，支持查询级、工作负载级、集群级三种调优粒度<sup>[AIDB09]</sup>。
+
+### 2.3 关键技术特征剖析
+
+查询感知性能调优的关键技术特征是查询级配置选择，由深度强化学习端到端驱动。QTune先对SQL查询进行特征化处理，将查询特征输入DRL模型以选择合适的配置，并进一步提出DS-DDPG模型，利用actor-critic网络结合查询向量和数据库状态完成配置调优动作<sup>[AIDB09]</sup>。该机制覆盖从查询级到集群级的完整调优粒度，在三个真实数据库系统上的实验结果优于最先进调优方法<sup>[AIDB09]</sup>。
+
+AI算子深度融合体现在将可学习索引与向量查询执行集成进数据库核心引擎。索引本质上是模型，B-tree、哈希与位图索引均可被包括深度学习模型在内的其他模型替代<sup>[AIDB08]</sup>；向量数据库管理系统需在设计中纳入向量搜索索引的构建、搜索与维护，以及计划枚举、计划选择、谓词混合查询算子和硬件加速<sup>[AIDB07]</sup>；Oracle AI Vector Search通过VECTOR数据类型承载嵌入模型转换结果，使非结构化数据直接进入SQL语义查询流程<sup>[AIDB06]</sup>。
+
+上述特征当前受制于调优问题固有复杂度、学习型结构验证的初步性与部署版本条件。旋钮调优是NP难问题，现有方法难以获取调优所需信息、仅支持粗粒度调优而无法提供细粒度调优<sup>[AIDB09]</sup>；学习索引仅在理论上可分析其优于传统索引结构的条件，现有结论尚处初步验证阶段<sup>[AIDB08]</sup>；VECTOR数据类型的使用要求COMPATIBLE初始化参数不低于23.4.0，构成明确的部署前提约束<sup>[AIDB06]</sup>。
+
+## 三、最新进展
+
+### 3.1 全球重大理论突破与里程碑成果
+
+2024年，GenSQL提出可查询数据库表生成式模型的概率编程系统，支持多种概率编程语言编写的表格数据模型，并通过新型类型系统与指称语义建立精确刻画可靠性保证的证明<sup>[AIDB11]</sup>。在临床试验异常检测与虚拟湿实验室条件合成数据生成两项真实案例中，GenSQL比常见基线更准确捕获数据复杂性，声明式语法比若干替代方案更简洁且不易出错，并在代表性基准上比最接近竞争对手实现1.7-6.8倍加速、运行时间与手写代码相当<sup>[AIDB11]</sup>。
+
+近三年内，AnDB提出跨结构化与非结构化数据的统一语义分析框架。用户以SQL类语句执行语义查询且无需AI专业知识，消除了传统text-to-SQL的歧义性，并由优化器在准确性、执行时间与财务成本间自动选择最优执行计划<sup>[AIDB10]</sup>。
+
+### 3.2 技术路线迭代与发展趋势
+
+向量数据库技术路线的一大演进方向是查询接口统一。Text2VectorSQL提出统一向量搜索与SQL查询的接口，构建了从训练数据合成管线、VectorSQLBench基准（覆盖3个数据库后端、4个数据源、12种组合）到细粒度评估指标的完整基础生态<sup>[AIDB12]</sup>。该路线当前的核心局限是SQL与向量检索的集成可靠性：实验显示SQL过滤器与向量搜索的集成会导致比传统过滤向量搜索更明显的结果遗漏，即召回率退化<sup>[AIDB12]</sup>。
+
+在存储与索引路线上，2021年SPANN以十亿级高召回搜索确立里程碑成果。在三个十亿级数据集上，达到90%召回且内存成本相同时比当时最先进的ANNS方案DiskANN快2倍，仅用32GB内存即可在约1毫秒内达到90%的recall@1与recall@10<sup>[AIDB13]</sup>。其高性能来自内存-磁盘混合倒排索引设计：质心点驻留内存、大型倒排列表存于磁盘，构建阶段以层次化平衡聚类均衡列表长度，搜索阶段以查询感知方案动态剪枝不必要的倒排列表访问<sup>[AIDB13]</sup>。
+
+两条路线的成熟度落差揭示当前阶段判断：查询接口层仍存在SQL集成带来的可靠性瓶颈，而存储索引层已具备十亿级毫秒级检索能力，向量数据库技术整体处于存储性能已获验证、接口可靠性尚待补强的演进过渡期<sup>[AIDB12][AIDB13]</sup>。
+
+### 3.3 产业生态与产品布局
+
+产业生态层面，RAG技术已成为AI原生数据库对接生成式AI的主流范式。Amazon Aurora PostgreSQL可配置为Amazon Bedrock的知识库，并利用Aurora ML从Amazon Bedrock生成向量嵌入，实现“知识库挂载—向量嵌入生成—RAG落地”的完整工程链路<sup>[AIDB15]</sup>。产品布局方面，传统数据库AI化、专用向量库与AI原生数据库三极分化的产品形态正在形成<sup>[AIDB04][AIDB05]</sup>，但具体产品演进与资本动态的公开证据尚不充分。
+
+## 四、应用前景与多维价值
+
+### 4.1 典型业务与工程应用场景
+
+RAG是AI原生数据库对接生成式AI的典型应用范式，其技术机理是把领域特定信息与大模型（FM）结合，以丰富生成式AI应用的响应内容<sup>[AIDB15]</sup>。该范式已落为具体工程链路：Amazon Aurora PostgreSQL被配置为Amazon Bedrock的知识库，并通过Aurora ML从Amazon Bedrock生成向量嵌入，完成RAG落地闭环<sup>[AIDB15]</sup>。
+
+向量扩展构成底层数据支撑。Amazon Aurora PostgreSQL与pgvector可为自然语言处理、聊天机器人和情感分析等AI/ML工作负载提供数据层承载能力<sup>[AIDB15]</sup>，使同一数据库在RAG场景之外覆盖更广泛的AI/ML业务类型。
+
+### 4.3 社会治理与运维价值
+
+智能诊断具备对常规DBA工作的替代价值。D-Bot基于大语言模型，可在10分钟以内生成合理且有依据的诊断报告，而DBA通常需要数小时，显著压缩人工诊断时间<sup>[AIDB16]</sup>。
+
+自治系统运维效率提升源于诊断流程的自动化机制。D-Bot通过文档离线知识提取、自动提示生成、树搜索根因分析与多根因协作，将异常诊断自动化；在包含六个典型应用的539个异常基准测试中，其对未见异常的根因分析效果显著优于传统方法和GPT-4等基础模型<sup>[AIDB16]</sup>。
+
+智能诊断的替代边界在于输出被定性为“合理且有依据”而非绝对可靠，且验证场景仅覆盖六个应用；同时素材未提供技术风险与治理框架证据，因此AI原生数据库的社会治理价值目前仅能确认效率维度，风险与规制边界缺乏依据<sup>[AIDB16]</sup>。
+
+## 结论与展望
+面向AI的新型数据库技术已完成从概念验证到工程落地的关键跨越：存储索引层具备十亿级毫秒检索能力，查询接口层正突破SQL与向量检索的集成可靠性瓶颈，智能诊断与RAG等应用范式已验证实际价值。未来发展方向集中于三方面：一是深化AI4DB与DB4AI双向赋能，推动AI能力从外挂走向内嵌；二是完善混合查询优化与学习索引的理论基础，突破NP难调优与召回率退化等核心约束；三是把握产业格局重塑机遇，以数据库智能体为入口降低使用门槛，推动国产数据库在AI时代实现换道超车。
+
+## 参考文献
+
+[AIDB01] IEEE Transactions on Knowledge and Data Engineering (TKDE). Database Meets Artificial Intelligence: A Survey.[EB/OL]. 2020. https://doi.org/10.1109/TKDE.2020.2994641[引用日期 2026-08-31]。
+[AIDB02] 软件学报. XuanYuan: An AI-Native Database（轩辕：AI原生数据库系统）.[EB/OL]. 2020. https://www.jos.org.cn/html/2020/3/5899.htm[引用日期 2026-08-31]。
+[AIDB03] arXiv. When Large Language Models Meet Vector Databases: A Survey.[EB/OL]. 2024. https://arxiv.org/abs/2402.01763[引用日期 2026-08-31]。
+[AIDB04] IDC & 移动云. AI原生数据库发展趋势白皮书.[EB/OL]. 2025. https://www.sdyanbao.com/detail/970101[引用日期 2026-08-31]。
+[AIDB05] 中国信息通信研究院. AI原生数据库技术要求.[EB/OL]. 2025. https://www.sdyanbao.com/detail/970101[引用日期 2026-08-31]。
+[AIDB06] Oracle官方文档. Oracle AI Vector Search User's Guide.[EB/OL]. 2024. https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/ai-vector-search-users-guide.pdf[引用日期 2026-08-31]。
+[AIDB07] The VLDB Journal. Survey of vector database management systems.[EB/OL]. 2024. https://doi.org/10.1007/s00778-024-00864-x[引用日期 2026-08-31]。
+[AIDB08] SIGMOD. The Case for Learned Index Structures.[EB/OL]. 2018. https://doi.org/10.1145/3183713.3196909[引用日期 2026-08-31]。
+[AIDB09] PVLDB. QTune: A Query-Aware Database Tuning System with Deep Reinforcement Learning.[EB/OL]. 2019. https://www.vldb.org/pvldb/vol12/p2118-li.pdf[引用日期 2026-08-31]。
+[AIDB10] arXiv. AnDB: Breaking Boundaries with an AI-Native Database for Universal Semantic Analysis.[EB/OL]. 2025. https://arxiv.org/abs/2502.13805[引用日期 2026-08-31]。
+[AIDB11] PLDI 2024 / arXiv. GenSQL: A Probabilistic Programming System for Querying Generative Models of Database Tables.[EB/OL]. 2024. https://arxiv.org/abs/2406.15652[引用日期 2026-08-31]。
+[AIDB12] arXiv. Text2VectorSQL: Towards a Unified Interface for Vector Search and SQL Queries.[EB/OL]. 2025. https://arxiv.org/abs/2506.23071[引用日期 2026-08-31]。
+[AIDB13] NeurIPS 2021 / arXiv. SPANN: Highly-efficient Billion-scale Approximate Nearest Neighbor Search.[EB/OL]. 2021. https://arxiv.org/abs/2111.08566[引用日期 2026-08-31]。
+[AIDB14] Crunchbase. 全球向量数据库产业与资本动态追踪.[EB/OL]. 持续更新. https://www.crunchbase.com[引用日期 2026-08-31]。
+[AIDB15] AWS官方博客. Build generative AI applications with Amazon Aurora and Amazon Bedrock Knowledge Bases.[EB/OL]. 2024. https://aws.amazon.com/blogs/database/build-generative-ai-applications-with-amazon-aurora-and-amazon-bedrock-knowledge-bases/[引用日期 2026-08-31]。
+[AIDB16] arXiv / VLDB. D-Bot: Database Diagnosis System using Large Language Models.[EB/OL]. 2023. https://arxiv.org/abs/2312.01454[引用日期 2026-08-31]。
