@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scientific-report-workflow"
+version = "3.0.0"
+description = "把文献清单自动加工成带可核验引用的技术调研报告（Markdown / Word）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "PyYAML>=6.0",
+  "python-docx>=1.1",
+  "requests>=2.31",
+  "beautifulsoup4>=4.12",
+  "trafilatura>=1.8",
+  "openai>=1.30",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+pdf = ["pypdf>=4.0"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.scripts]
+report-wf = "report_workflow.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["report_workflow*"]
+
+[tool.setuptools.package-data]
+report_workflow = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["F", "E9"]
+ignore = []

@@ -1,0 +1,178 @@
+# 专题配置：大模型低精度计算技术
+# 字段说明见 projects/_template/project.yaml 与 README
+project:
+  slug: low_precision
+  name: 大模型低精度计算技术（Low-Precision Computing for LLMs）
+  report_title: 大模型低精度计算技术调研报告
+  version: v1.2
+  id_prefix: LBQ
+  theme: 大模型量化;低精度计算;GPTQ;AWQ;SmoothQuant;BitNet;推理优化
+  audience: AI系统架构师;模型推理工程师;技术战略人员;硬件研发工程师;AI运维人员
+  root: output
+llm:
+  provider: openai_compatible
+  api_key_env: DEEPSEEK_API_KEY
+  base_url_env: DEEPSEEK_BASE_URL
+  default_base_url: https://api.deepseek.com
+  structure_model: deepseek-chat
+  analyze_model: deepseek-reasoner
+  draft_model: deepseek-chat
+  review_model: deepseek-chat
+  temperature_fast: 0.1
+  temperature_draft: 0.2
+  max_tokens_structure: 7000
+  max_tokens_analyze: 8192
+  max_tokens_draft: 8000
+  min_section_chars: 200
+  max_section_chars: 800
+  max_retries: 3
+  concurrency: 3
+  cache: true
+fetch:
+  timeout: 30
+  max_retries: 3
+  polite_delay_sec: 2.0
+  arxiv_full_text: true
+  max_body_chars: 150000
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+retrieval:
+  chunk_chars: 700
+  top_k: 8
+  per_source_max: 3
+  always_include_head: true
+  max_items_per_section: 8
+word_count:
+  body_min: 3500
+  body_max: 3900
+  abstract_min: 280
+  abstract_max: 320
+  conclusion_min: 150
+  conclusion_max: 200
+  keywords_min: 5
+  keywords_max: 7
+draft:
+  persona: 专业技术情报分析师与报告撰稿人
+  style_rules:
+  - 读者对象：AI系统架构师;模型推理工程师;技术战略人员;硬件研发工程师;AI运维人员；用其熟悉的术语，不做科普式铺垫
+  max_paragraph_chars: 150
+  chapter_tolerance: 0.2
+  max_rewrites: 2
+references:
+  only_cited: false
+  numbering: manifest
+  max_authors: 0
+  access_date: today
+qc:
+  llm_check: false
+  llm_check_max_sentences: 60
+word:
+  font_cn: 仿宋
+  font_en: Times New Roman
+  size_title_pt: 22
+  size_heading_pt: 16
+  size_body_pt: 16
+  size_citation_pt: 12
+  line_spacing: 1.5
+  toc: false
+  page_numbers: true
+  abstract_style: heading
+report:
+  chapters:
+  - id: '01'
+    heading: 一、遴选理由
+    source_chapters:
+    - '01'
+    weight: 5
+    no_subheadings: true
+    synthesis: true
+    write_guide: 综述性章节，基于后三章已写内容做归纳：说明该技术为何值得持续跟踪（技术特征与优势、核心价值、突破性背景）。只做判断式归纳，不展开技术细节与数据，细节留给后文。
+  - id: '02'
+    heading: 二、技术内涵
+    source_chapters:
+    - '02'
+    weight: 9
+    write_guide: 回答“它是什么、怎么运作”：先界定概念与边界，再讲核心机理与系统架构，最后给出指标体系与适用边界；围绕技术本身组织，避免按文献逐篇罗列。
+    sections:
+    - 2.1 概念定义与标准边界
+    - 2.2 底层量化方法与系统架构
+    - 2.3 硬件协同优化与基准体系
+  - id: '03'
+    heading: 三、最新进展
+    source_chapters:
+    - '03'
+    weight: 8
+    write_guide: 回答“发展到哪一步”：按技术路线的迭代逻辑组织；每条进展必须包含“时间—主体—成果”三要素，只写证据中有的进展。
+    sections:
+    - 3.1 训练侧量化技术突破
+    - 3.2 推理侧量化技术迭代
+    - 3.3 产业生态与工具链演进
+  - id: '04'
+    heading: 四、应用前景与多维价值
+    source_chapters:
+    - '04'
+    weight: 7
+    write_guide: 回答“有什么价值”：按“场景→价值逻辑→战略意义”递进；只写文献已证明或明确论证的价值，不做无依据的预测。
+    sections:
+    - 4.1 端侧部署与边缘AI场景
+    - 4.2 数据中心能效与成本价值
+chapters:
+- id: '01'
+  name: 一、遴选理由
+  folder: 01-遴选理由与核心价值
+  sections:
+  - id: '1.1'
+    name: 技术代际特征与核心优势
+    extract_rule: 对比全精度推理与低精度计算的本质差异，引用 [LBQ01] SmoothQuant训练后量化里程碑成果与 [LBQ02] NVIDIA TensorRT官方FP8量化工程指南。
+    analyze_task: 提炼低精度计算技术区别于全精度模型的核心特征（显存占用缩减、推理延迟降低、硬件算力利用率提升等），作为遴选理由中'技术差异化优势'部分的论据素材。
+  - id: '1.2'
+    name: 能效革命与绿色AI战略价值
+    extract_rule: 以Green AI能效研究 [LBQ03] 为核心，聚焦低精度计算在降低AI计算能耗、推动绿色算力普及的战略价值。
+    analyze_task: 归纳低精度计算在提升算力能效比、降低数据中心碳足迹、推动AI普惠化等方面的战略价值，论证其作为AI推理基础设施核心优化方向的核心逻辑。
+  - id: '1.3'
+    name: 产业落地的驱动因素
+    extract_rule: 梳理产业端大模型部署从“精度优先”向“精度-效率平衡”转型的趋势，引用 [LBQ04] 低比特大模型系统性综述。
+    analyze_task: 梳理近年推动低精度计算技术突破的关键动向（大模型端侧落地需求、推理成本高企、通用算力瓶颈等），作为遴选理由中'突破性进展与行业热度'部分的论据素材。
+- id: '02'
+  name: 二、技术内涵
+  folder: 02-技术内涵与核心机理
+  sections:
+  - id: '2.1'
+    name: 概念定义与标准边界
+    extract_rule: 重点提取ISO/IEC国际标准 [LBQ05] 中AI领域核心术语定义，结合低比特量化综述 [LBQ04] 界定低精度计算的概念范畴与技术边界。
+    analyze_task: 精准界定大模型低精度计算的定义与概念边界，明确其技术内涵：权重量化、激活量化、量化位宽分级、训练后/训练中量化分类；表述专业严谨，只做概念界定不做发挥。
+  - id: '2.2'
+    name: 底层量化方法与系统架构
+    extract_rule: 对比主流推理框架的量化实现原理，引用 [LBQ06] TensorRT-LLM官方量化指南与 [LBQ07] vLLM量化架构文档。
+    analyze_task: 清晰拆解低精度计算的核心架构与运行逻辑：数值映射机制、量化误差校准、推理算子适配、系统级集成方式；按“数值标定→误差校准→算子适配→推理部署”链条组织，突出可复现性。
+  - id: '2.3'
+    name: 硬件协同优化与基准体系
+    extract_rule: 聚焦硬件原生量化指令集与性能评测标准，引用 [LBQ02] NVIDIA TensorRT FP8量化技术说明与 [LBQ08] MLPerf Inference基准测试体系。
+    analyze_task: 剖析低精度计算的硬件协同特征：主流计算架构原生量化指令、精度-性能基准评估体系、跨硬件平台适配能力；只陈述有文献支撑的技术特征，不做主观拔高。
+- id: '03'
+  name: 三、最新进展
+  folder: 03-全球最新进展与产业动态
+  sections:
+  - id: '3.1'
+    name: 训练侧量化技术突破
+    extract_rule: 盘点顶尖机构里程碑成果，聚焦QLoRA量化微调、AWQ激活感知量化等突破，引用 [LBQ09] QLoRA技术论文与 [LBQ10] AWQ系统研究。
+    analyze_task: 归纳近三年全球大模型低精度计算领域训练侧重大突破性进展与里程碑成果，每条进展必须含“时间—主体—成果”三要素，事实驱动、来源明确，不做主观拔高。
+  - id: '3.2'
+    name: 推理侧量化技术迭代
+    extract_rule: 绘制技术图谱，分析经典训练后量化路线与极致1-bit量化路线的技术分野，引用 [LBQ11] GPTQ经典方法、[LBQ12] 1-bit LLM里程碑研究与 [LBQ13] BitNet b1.58最新实证。
+    analyze_task: 梳理近三年低精度计算技术路线的迭代演进轨迹，判断当前所处的发展阶段与演进趋势；每条路线判断须有来源支撑。
+  - id: '3.3'
+    name: 产业生态与工具链演进
+    extract_rule: 调研全球主流开源生态的量化工具支持进展，引用 [LBQ14] Hugging Face Transformers量化工具链。
+    analyze_task: 梳理近三年低精度计算领域产品、产业、生态维度的重大动态，每条动态须有明确来源与量化事实支撑，避免空泛概括。
+- id: '04'
+  name: 四、应用前景与多维价值
+  folder: 04-应用前景与多维价值评估
+  sections:
+  - id: '4.1'
+    name: 端侧部署与边缘AI场景
+    extract_rule: 分析端侧大模型部署的技术落地路径，引用 [LBQ15] 高通端侧AI官方研究专题资源。
+    analyze_task: 归纳低精度计算技术的典型落地应用场景与工程范式（端侧生成式AI、边缘智能设备、离线推理系统等），场景描述须具体到技术环节。
+  - id: '4.2'
+    name: 数据中心能效与成本价值
+    extract_rule: 评估数据中心AI推理的能效提升与成本节约价值，引用 [LBQ16] IEA数据中心与AI能耗分析报告。
+    analyze_task: 从经济效益与社会效应层面研判低精度计算技术的价值与边界：推理算力成本下降幅度、数据中心能耗降低比例、技术风险与适用场景；研判须有理有据，优先使用权威来源的结论。

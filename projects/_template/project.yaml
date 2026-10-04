@@ -1,0 +1,169 @@
+# ============================================================
+# 专题配置模板  ——  复制为新专题：report-wf init <专题名>
+# 一个专题 = 本目录（project.yaml + literature_manifest.yaml）。改配置，不改代码。
+# ============================================================
+project:
+  slug: "__SLUG__"
+  name: "示例专题（English Name）"            # 研究主题全称，写进 Prompt
+  report_title: "示例专题技术调研报告"          # 终稿标题，也是输出文件名的一部分
+  version: "v1.0"
+  id_prefix: "XX"                             # 文献编号前缀：XX01、XX02……（须与 manifest 一致）
+  theme: "关键词A;关键词B"
+  audience: "目标读者A;目标读者B"
+  root: "output"                              # 输出根目录（相对本文件所在目录；也可写绝对路径或用 --root 覆盖）
+
+# ---------------- LLM（OpenAI 兼容接口，DeepSeek 开箱即用）----------------
+llm:
+  provider: openai_compatible                 # openai_compatible | mock（离线演示）
+  api_key_env: DEEPSEEK_API_KEY               # 环境变量名；密钥写在 .env，不写在这里
+  base_url_env: DEEPSEEK_BASE_URL
+  default_base_url: https://api.deepseek.com
+  structure_model: deepseek-chat              # 阶段2 证据抽取
+  analyze_model: deepseek-reasoner            # 阶段3 分析（推理模型会自动忽略 temperature）
+  draft_model: deepseek-chat                  # 阶段4 成稿 / 审稿
+  review_model: deepseek-chat
+  temperature_fast: 0.1
+  temperature_draft: 0.2
+  max_tokens_structure: 7000
+  max_tokens_analyze: 8192
+  max_tokens_draft: 8000
+  min_section_chars: 200                      # 阶段3 每小节分析字数范围
+  max_section_chars: 800
+  max_retries: 3
+  concurrency: 3                              # 并发调用数（按服务商限速调整）
+  cache: true                                 # 相同输入不重复调用模型（增量重跑）
+
+# ---------------- 阶段1 抓取 ----------------
+fetch:
+  timeout: 30
+  max_retries: 3
+  polite_delay_sec: 2.0
+  arxiv_full_text: true                       # arXiv 优先抓 HTML/PDF 全文（PDF 需 pypdf）
+  max_body_chars: 150000
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+
+# ---------------- 阶段2 检索（取代旧版“文首+文末”截断）----------------
+retrieval:
+  chunk_chars: 700                            # 分块大小
+  top_k: 8                                    # 每个小节送给模型的原文块数
+  per_source_max: 3                           # 每个来源最多取几块
+  always_include_head: true                   # 每个来源保底带文首块（定义通常在文首）
+  max_items_per_section: 8                    # 每个小节最多保留几条证据
+
+# ---------------- 篇幅预算（中文字符口径，不含标题与引用角标）----------------
+word_count:
+  body_min: 2800
+  body_max: 3200
+  abstract_min: 250
+  abstract_max: 300
+  conclusion_min: 150
+  conclusion_max: 200
+  keywords_min: 5
+  keywords_max: 7
+
+# ---------------- 阶段4 成稿 ----------------
+draft:
+  persona: "专业技术情报分析师与报告撰稿人"
+  style_rules:                                # 专题级写作要求，逐条写进 Prompt
+    - "读者对象：目标读者A、目标读者B；用其熟悉的术语，不做科普式铺垫"
+  max_paragraph_chars: 150
+  chapter_tolerance: 0.2                      # 各章字数允许偏离目标 ±20%
+  max_rewrites: 2                             # 单章质检不过时最多带反馈重写几次
+
+# ---------------- 参考文献 ----------------
+references:
+  only_cited: false                           # true：只列正文被引用的文献
+  numbering: manifest                         # manifest（编号顺序）| first_cited（首次引用顺序）
+  max_authors: 0                              # >0：作者超过该数时写“前N位, 等”
+  access_date: today                          # today | 固定日期 "2026-10-01" | ""（不写引用日期）
+
+# ---------------- 质检 ----------------
+qc:
+  llm_check: false                            # true：质检阶段额外做 LLM 句级核验（耗费 token）
+  llm_check_max_sentences: 60
+
+# ---------------- 阶段6 Word ----------------
+word:
+  font_cn: "仿宋"
+  font_en: "Times New Roman"
+  size_title_pt: 22
+  size_heading_pt: 16
+  size_body_pt: 16
+  size_citation_pt: 12
+  line_spacing: 1.5
+  toc: false                                  # true：插入目录域（Word 打开时更新）
+  page_numbers: true
+  abstract_style: heading                     # heading | inline（“摘要：……”行内标签）
+  # template: "my_template.docx"              # 可选：套用你单位的样式模板
+
+# ============================================================
+# 成稿结构：与“取材章（chapters）”分离，可把多个取材章压缩成更少的节
+#   source_chapters  取材自哪些分析章（默认 [id]）
+#   sections         成稿的小节标题（省略 = 沿用对应分析章的小节）
+#   weight           篇幅权重：各章目标字数 = 正文中值 × weight / Σweight
+#   write_guide      本章写作要点（以前写死在代码里，现在属于专题配置）
+#   no_subheadings   true：整章连续成文，不设 ### 小节
+#   synthesis        true：最后写，可参考其他章成稿（常用于“遴选理由”这类归纳章）
+# ============================================================
+report:
+  chapters:
+    - id: "01"
+      heading: "一、遴选理由"
+      source_chapters: ["01"]
+      weight: 5
+      no_subheadings: true
+      synthesis: true
+      write_guide: "综述性章节，基于后三章已写内容做归纳：说明该技术为何值得持续跟踪。只做判断式归纳，不展开技术细节与数据。"
+    - id: "02"
+      heading: "二、技术内涵"
+      source_chapters: ["02"]
+      weight: 9
+      write_guide: "回答“它是什么、怎么运作”：先界定概念与边界，再讲机理，最后给出指标与适用边界。"
+    - id: "03"
+      heading: "三、最新进展"
+      source_chapters: ["03"]
+      weight: 8
+      write_guide: "回答“发展到哪一步”：按技术路线迭代组织；每条进展必须包含“时间—主体—成果”。"
+    - id: "04"
+      heading: "四、应用前景与价值"
+      source_chapters: ["04"]
+      weight: 7
+      write_guide: "回答“有什么价值”：场景→价值逻辑→战略意义；只写文献已证明的价值。"
+
+# ============================================================
+# 取材章（阶段 2/3 的单位）：每个小节一条 extract_rule（抽什么）+ analyze_task（怎么分析）
+#   folder 是 02-原始素材 下的子目录名，manifest 的 chapter 字段必须与之一致
+# ============================================================
+chapters:
+  - id: "01"
+    name: "一、遴选理由"
+    folder: "01-遴选理由"
+    sections:
+      - id: "1.1"
+        name: "技术特征与核心价值"
+        extract_rule: "只提取……；不展开……"
+        analyze_task: "归纳……，说明……"
+  - id: "02"
+    name: "二、技术内涵"
+    folder: "02-技术内涵"
+    sections:
+      - id: "2.1"
+        name: "概念与机理"
+        extract_rule: "重点提取……（核心依据 XX02）"      # 点名的编号会被自动加入该小节的候选来源
+        analyze_task: "拆解……"
+  - id: "03"
+    name: "三、最新进展"
+    folder: "03-最新进展"
+    sections:
+      - id: "3.1"
+        name: "代表性进展"
+        extract_rule: "提取近两年的标志性进展（时间、主体、成果）"
+        analyze_task: "梳理……的迭代路径"
+  - id: "04"
+    name: "四、应用前景与价值"
+    folder: "04-应用前景与价值"
+    sections:
+      - id: "4.1"
+        name: "典型应用场景"
+        extract_rule: "提取被文献证明的应用场景与价值"
+        analyze_task: "归纳……"

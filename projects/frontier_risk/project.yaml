@@ -1,149 +1,186 @@
-# ============================================================
-# 专题：前沿模型风险评估技术（Frontier Model Risk Assessment）
-# 复用方式：本文件 + 同目录 literature_manifest.yaml 即完整描述该专题
-# ============================================================
-
+# 专题配置：前沿模型风险评估技术
+# 成稿结构（report.chapters）与取材章（chapters）分离：成稿把 4 个分析章压缩为 2 节/章
 project:
-  name: "前沿模型风险评估技术（Frontier Model Risk Assessment）"
-  # 对齐你的 Obsidian 工作目录（macOS 本机绝对路径）
-  root: "/Users/andrea_bnu/Downloads/Andrea_Work/前沿模型风险评估技术报告"
-  report_title: "前沿模型风险评估技术调研报告"
-  version: "v1.0"
-  id_prefix: "FR"                 # 正文引用形如 [FR01]
-  theme: "人工智能安全; 前沿模型; 风险评估; 智能体审计; 红队测试"
-  audience: "AI安全研究人员; 科技情报人员; 模型治理与合规人员"
-
+  slug: frontier_risk
+  name: 前沿模型风险评估技术（Frontier Model Risk Assessment）
+  report_title: 前沿模型风险评估技术调研报告
+  version: v1.0
+  id_prefix: FR
+  theme: 人工智能安全; 前沿模型; 风险评估; 智能体审计; 红队测试
+  audience: AI安全研究人员; 科技情报人员; 模型治理与合规人员
+  root: output
 llm:
-  api_key_env: "DEEPSEEK_API_KEY"
-  base_url_env: "DEEPSEEK_BASE_URL"
-  default_base_url: "https://api.deepseek.com"
-  structure_model: "deepseek-chat"
-  analyze_model: "deepseek-reasoner"
-  draft_model: "deepseek-chat"
+  provider: openai_compatible
+  api_key_env: DEEPSEEK_API_KEY
+  base_url_env: DEEPSEEK_BASE_URL
+  default_base_url: https://api.deepseek.com
+  structure_model: deepseek-chat
+  analyze_model: deepseek-reasoner
+  draft_model: deepseek-chat
+  review_model: deepseek-chat
   temperature_fast: 0.1
   temperature_draft: 0.2
   max_tokens_structure: 7000
   max_tokens_analyze: 8192
   max_tokens_draft: 8000
   min_section_chars: 500
+  max_section_chars: 800
   max_retries: 3
-
+  concurrency: 3
+  cache: true
 fetch:
   timeout: 30
-  polite_delay_sec: 2.0          # 政府/官方站点较多，间隔放宽
-  arxiv_body_keep_head: 400
-  web_body_keep_head: 300
-  body_keep_tail: 1100
-  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-
+  max_retries: 3
+  polite_delay_sec: 2.0
+  arxiv_full_text: true
+  max_body_chars: 150000
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36
+retrieval:
+  chunk_chars: 700
+  top_k: 8
+  per_source_max: 3
+  always_include_head: true
+  max_items_per_section: 8
 word_count:
   body_min: 2800
   body_max: 3200
   abstract_min: 250
   abstract_max: 300
-
+  conclusion_min: 150
+  conclusion_max: 200
+  keywords_min: 5
+  keywords_max: 7
+draft:
+  persona: 专业技术情报分析师与报告撰稿人
+  style_rules:
+  - 读者对象：AI安全研究人员; 科技情报人员; 模型治理与合规人员；用其熟悉的术语，不做科普式铺垫
+  max_paragraph_chars: 150
+  chapter_tolerance: 0.2
+  max_rewrites: 2
+references:
+  only_cited: false
+  numbering: manifest
+  max_authors: 0
+  access_date: today
+qc:
+  llm_check: false
+  llm_check_max_sentences: 60
 word:
-  font_cn: "仿宋"
-  font_en: "Times New Roman"
+  font_cn: 仿宋
+  font_en: Times New Roman
   size_title_pt: 22
   size_heading_pt: 16
   size_body_pt: 16
   size_citation_pt: 12
   line_spacing: 1.5
-
-# ------------------------------------------------------------
-# 章节大纲（严格对应你的文献矩阵；第三章为 3 节）
-# ------------------------------------------------------------
+  toc: false
+  page_numbers: true
+  abstract_style: heading
+report:
+  chapters:
+  - id: '01'
+    heading: 一、遴选理由
+    source_chapters:
+    - '01'
+    weight: 5
+    synthesis: true
+    write_guide: 综述性章节，基于后三章已写内容做归纳：说明该技术为何值得持续跟踪（技术特征与优势、核心价值、突破性背景）。只做判断式归纳，不展开技术细节与数据，细节留给后文。
+    sections:
+    - 1.1 技术特征与演进优势
+    - 1.2 核心价值与突破背景
+  - id: '02'
+    heading: 二、技术内涵与评估机理
+    source_chapters:
+    - '02'
+    weight: 9
+    write_guide: 回答“它是什么、怎么运作”：先界定概念与边界，再讲核心机理与系统架构，最后给出指标体系与适用边界；围绕技术本身组织，避免按文献逐篇罗列。
+    sections:
+    - 2.1 概念范畴与核心评估机理
+    - 2.2 性能指标体系与适用边界
+  - id: '03'
+    heading: 三、技术演进与产业动态
+    source_chapters:
+    - '03'
+    weight: 8
+    write_guide: 回答“发展到哪一步”：按技术路线的迭代逻辑组织；每条进展必须包含“时间—主体—成果”三要素，只写证据中有的进展。
+    sections:
+    - 3.1 技术路线迭代与标志成果
+    - 3.2 产业化落地与生态动态
+  - id: '04'
+    heading: 四、应用前景与战略价值
+    source_chapters:
+    - '04'
+    weight: 7
+    write_guide: 回答“有什么价值”：按“场景→价值逻辑→战略意义”递进；只写文献已证明或明确论证的价值，不做无依据的预测。可从国家战略与安全治理层面研判，但只限文献已支撑的内容。
+    sections:
+    - 4.1 全生命周期应用范式
+    - 4.2 多维驱动价值与国家安全意义
 chapters:
-  - id: "01"
-    name: "一、遴选理由与核心价值"
-    folder: "01-遴选理由与核心价值"
-    sections:
-      - id: "1.1"
-        name: "技术特征与演进优势"
-        extract_rule: "聚焦前沿AI安全与风险评估的概念演进、从静态评测到动态评测的代际差异，不展开具体工具实现。"
-        analyze_task: "归纳前沿模型风险评估区别于传统LLM安全评测的技术特征与代际优势，说明其解决了静态评测的哪些核心痛点。"
-      - id: "1.2"
-        name: "核心价值"
-        extract_rule: "以 NIST AI RMF 1.0 官方框架为核心，聚焦安全对齐、合规评估、风险缓释的治理框架价值证据，不罗列框架条文。"
-        analyze_task: "以 NIST AI RMF 1.0 官方框架为核心，论证风险评估技术在安全对齐、合规治理与风险缓释上的核心价值逻辑，说明其治理杠杆作用。"
-      - id: "1.3"
-        name: "突破性演进背景"
-        extract_rule: "提取推动风险评估突破的极端风险评测、安全底线、突变能力相关科学与工程背景，而非事件年表。"
-        analyze_task: "梳理推动前沿风险评估加速成型的关键背景：极端风险、突变能力与安全底线需求，分析其从概念走向工程范式的原因。"
-
-  - id: "02"
-    name: "二、技术内涵与评估机理"
-    folder: "02-技术内涵与评估机理"
-    sections:
-      - id: "2.1"
-        name: "技术定义与概念范畴"
-        extract_rule: "重点提取前沿模型评估、极端风险评估、红队测试、风险边界的奠基性权威定义与范畴（核心依据 Model evaluation for extreme risks）。"
-        analyze_task: "基于奠基性文献提炼前沿模型极端风险评估的权威定义共识，界定评估对象、红队测试与极端风险边界的概念范畴，辨析其与传统对齐、常规红队的关系。"
-      - id: "2.2"
-        name: "核心评估机理与底层逻辑"
-        extract_rule: "重点提取红队测试机制、思维链审计、因果场景建模及‘部署环境-威胁源-使能能力’类评估模型的机理证据。"
-        analyze_task: "拆解前沿风险评估的核心机理：红队、CoT审计、因果场景建模与威胁建模框架如何构成可复现评估闭环。"
-      - id: "2.3"
-        name: "技术特征与性能指标"
-        extract_rule: "聚焦风险量化指标、假阳性率、评测鲁棒性、METR 长周期自主性安全事件记录口径等指标体系证据。"
-        analyze_task: "构建风险评估的指标坐标系：量化指标、METR 类长周期自主性事件记录口径与鲁棒性标准，并讨论指标可比性与局限。"
-      - id: "2.4"
-        name: "技术边界与适用约束"
-        extract_rule: "聚焦评测污染、安全清洗(safety washing)、提示词盾失效等边界证据（MIT/剑桥 AI Agent Index, ACM FAccT）；证据不足写‘暂无充分证据’。"
-        analyze_task: "明确当前风险评估的能力边界与系统性约束，重点剖析‘高层安全承诺—实证缺乏’的安全清洗鸿沟及其成因。"
-
-  - id: "03"
-    name: "三、技术演进与产业动态"
-    folder: "03-技术演进与产业动态"
-    sections:
-      - id: "3.1"
-        name: "核心技术路线的迭代演进"
-        extract_rule: "聚焦从静态数据集评测走向系统安全工程（故障树分析、沙盒行为因果建模、风险建模）的技术路线演进证据。"
-        analyze_task: "梳理前沿 AI 风险管理从静态数据集到故障树、沙盒行为因果建模等系统安全工程方法的路线迭代，分析各方法机理差异与适用面。"
-      - id: "3.2"
-        name: "标志性方法学与系统框架成果"
-        extract_rule: "聚焦智能体代码生成的可靠性与安全性测评、代码供应链、沙盒红队对抗等标志性实证成果，提取方法学要点而非新闻描述。"
-        analyze_task: "归纳代码供应链可靠性与安全性测评这一标志性实证成果，说明其实验设计、基准价值与可复用的方法学框架。"
-      - id: "3.3"
-        name: "产业化落地与生态动态"
-        extract_rule: "以 Frontier Model Forum 行业指南为核心，只放自动化红队评测工具链、输入/推理审计、第三方安全工具链等产业化与生态证据；不足时写‘暂无充分证据’。"
-        analyze_task: "总结自动化红队、输入与推理审计、第三方安全工具链的产业化形态（FMF 行业指南），刻画能力边界与生态所处阶段。"
-
-  - id: "04"
-    name: "四、应用前景与战略价值"
-    folder: "04-应用前景与战略价值"
-    sections:
-      - id: "4.1"
-        name: "典型应用场景与全生命周期审视"
-        extract_rule: "聚焦训练前评测、部署后动态监控、API调用拦截等全生命周期场景证据。"
-        analyze_task: "归纳风险评估在模型全生命周期（训练前—部署中—运行时）的落地范式，说明‘从问答测试到动态信任’的跃迁逻辑。"
-      - id: "4.2"
-        name: "科技与产业维度的驱动价值"
-        extract_rule: "只放被文献证明的鲁棒性提升、可解释性增强、对抗防御与工程反哺证据。"
-        analyze_task: "从鲁棒性、可解释性、对抗防御三维度，分析评测技术对模型与工程体系的反哺价值。"
-      - id: "4.3"
-        name: "经济、社会与国家安全价值"
-        extract_rule: "聚焦借鉴核能、航空等高危行业成熟风险管理、双用途风险、关键基础设施保护与国家级安全防线的证据。"
-        analyze_task: "以核能、航空等高危行业风险管理为参照，研判前沿模型双用途风险评估对关键基础设施保护与国家自主防线建设的战略价值与治理逻辑。"
-
-# ------------------------------------------------------------
-# 阶段4成稿蓝图（对四章素材压缩后的报告结构；阶段5校验基准）
-# ------------------------------------------------------------
-report_blueprint:
-  - "## 摘要"
-  - "## 关键词"
-  - "## 一、遴选理由"
-  - "### 1.1 技术特征与演进优势"
-  - "### 1.2 核心价值与突破背景"
-  - "## 二、技术内涵与评估机理"
-  - "### 2.1 概念范畴与核心评估机理"
-  - "### 2.2 性能指标体系与适用边界"
-  - "## 三、技术演进与产业动态"
-  - "### 3.1 技术路线迭代与标志成果"
-  - "### 3.2 产业化落地与生态动态"
-  - "## 四、应用前景与战略价值"
-  - "### 4.1 全生命周期应用范式"
-  - "### 4.2 多维驱动价值与国家安全意义"
-  - "## 结论与展望"
-  - "## 参考文献"
+- id: '01'
+  name: 一、遴选理由与核心价值
+  folder: 01-遴选理由与核心价值
+  sections:
+  - id: '1.1'
+    name: 技术特征与演进优势
+    extract_rule: 聚焦前沿AI安全与风险评估的概念演进、从静态评测到动态评测的代际差异，不展开具体工具实现。
+    analyze_task: 归纳前沿模型风险评估区别于传统LLM安全评测的技术特征与代际优势，说明其解决了静态评测的哪些核心痛点。
+  - id: '1.2'
+    name: 核心价值
+    extract_rule: 以 NIST AI RMF 1.0 官方框架为核心，聚焦安全对齐、合规评估、风险缓释的治理框架价值证据，不罗列框架条文。
+    analyze_task: 以 NIST AI RMF 1.0 官方框架为核心，论证风险评估技术在安全对齐、合规治理与风险缓释上的核心价值逻辑，说明其治理杠杆作用。
+  - id: '1.3'
+    name: 突破性演进背景
+    extract_rule: 提取推动风险评估突破的极端风险评测、安全底线、突变能力相关科学与工程背景，而非事件年表。
+    analyze_task: 梳理推动前沿风险评估加速成型的关键背景：极端风险、突变能力与安全底线需求，分析其从概念走向工程范式的原因。
+- id: '02'
+  name: 二、技术内涵与评估机理
+  folder: 02-技术内涵与评估机理
+  sections:
+  - id: '2.1'
+    name: 技术定义与概念范畴
+    extract_rule: 重点提取前沿模型评估、极端风险评估、红队测试、风险边界的奠基性权威定义与范畴（核心依据 Model evaluation for extreme risks）。
+    analyze_task: 基于奠基性文献提炼前沿模型极端风险评估的权威定义共识，界定评估对象、红队测试与极端风险边界的概念范畴，辨析其与传统对齐、常规红队的关系。
+  - id: '2.2'
+    name: 核心评估机理与底层逻辑
+    extract_rule: 重点提取红队测试机制、思维链审计、因果场景建模及‘部署环境-威胁源-使能能力’类评估模型的机理证据。
+    analyze_task: 拆解前沿风险评估的核心机理：红队、CoT审计、因果场景建模与威胁建模框架如何构成可复现评估闭环。
+  - id: '2.3'
+    name: 技术特征与性能指标
+    extract_rule: 聚焦风险量化指标、假阳性率、评测鲁棒性、METR 长周期自主性安全事件记录口径等指标体系证据。
+    analyze_task: 构建风险评估的指标坐标系：量化指标、METR 类长周期自主性事件记录口径与鲁棒性标准，并讨论指标可比性与局限。
+  - id: '2.4'
+    name: 技术边界与适用约束
+    extract_rule: 聚焦评测污染、安全清洗(safety washing)、提示词盾失效等边界证据（MIT/剑桥 AI Agent Index, ACM FAccT）；证据不足写‘暂无充分证据’。
+    analyze_task: 明确当前风险评估的能力边界与系统性约束，重点剖析‘高层安全承诺—实证缺乏’的安全清洗鸿沟及其成因。
+- id: '03'
+  name: 三、技术演进与产业动态
+  folder: 03-技术演进与产业动态
+  sections:
+  - id: '3.1'
+    name: 核心技术路线的迭代演进
+    extract_rule: 聚焦从静态数据集评测走向系统安全工程（故障树分析、沙盒行为因果建模、风险建模）的技术路线演进证据。
+    analyze_task: 梳理前沿 AI 风险管理从静态数据集到故障树、沙盒行为因果建模等系统安全工程方法的路线迭代，分析各方法机理差异与适用面。
+  - id: '3.2'
+    name: 标志性方法学与系统框架成果
+    extract_rule: 聚焦智能体代码生成的可靠性与安全性测评、代码供应链、沙盒红队对抗等标志性实证成果，提取方法学要点而非新闻描述。
+    analyze_task: 归纳代码供应链可靠性与安全性测评这一标志性实证成果，说明其实验设计、基准价值与可复用的方法学框架。
+  - id: '3.3'
+    name: 产业化落地与生态动态
+    extract_rule: 以 Frontier Model Forum 行业指南为核心，只放自动化红队评测工具链、输入/推理审计、第三方安全工具链等产业化与生态证据；不足时写‘暂无充分证据’。
+    analyze_task: 总结自动化红队、输入与推理审计、第三方安全工具链的产业化形态（FMF 行业指南），刻画能力边界与生态所处阶段。
+- id: '04'
+  name: 四、应用前景与战略价值
+  folder: 04-应用前景与战略价值
+  sections:
+  - id: '4.1'
+    name: 典型应用场景与全生命周期审视
+    extract_rule: 聚焦训练前评测、部署后动态监控、API调用拦截等全生命周期场景证据。
+    analyze_task: 归纳风险评估在模型全生命周期（训练前—部署中—运行时）的落地范式，说明‘从问答测试到动态信任’的跃迁逻辑。
+  - id: '4.2'
+    name: 科技与产业维度的驱动价值
+    extract_rule: 只放被文献证明的鲁棒性提升、可解释性增强、对抗防御与工程反哺证据。
+    analyze_task: 从鲁棒性、可解释性、对抗防御三维度，分析评测技术对模型与工程体系的反哺价值。
+  - id: '4.3'
+    name: 经济、社会与国家安全价值
+    extract_rule: 聚焦借鉴核能、航空等高危行业成熟风险管理、双用途风险、关键基础设施保护与国家级安全防线的证据。
+    analyze_task: 以核能、航空等高危行业风险管理为参照，研判前沿模型双用途风险评估对关键基础设施保护与国家自主防线建设的战略价值与治理逻辑。
