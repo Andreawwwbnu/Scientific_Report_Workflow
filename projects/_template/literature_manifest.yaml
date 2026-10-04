@@ -1,0 +1,52 @@
+# ============================================================
+# 文献清单（唯一事实源）。字段：
+#   id          必填，前缀须等于 project.id_prefix
+#   title / url / chapter / section   必填（chapter = chapters.folder，section = 小节 id）
+#   publisher   发布主体（无个人作者时写机构；参考文献里作者缺省回退到它）
+#   author      可选。禁止写 et al.，请补全或留空（arXiv 会自动回填作者）
+#   date        发布时间（取前 4 位作为年份）
+#   lit_type / credibility / tags   说明性字段
+#   ref_type    参考文献类型标识，默认 EB/OL（期刊可写 J）
+#   alias_for   镜像文献：写主文献编号，正文引用会自动归并到主编号
+#   related_urls  同一成果的关联入口（如项目站 + 论文），会一并抓取拼接
+#   local_file  本地正文（相对本目录，md/txt/pdf）；有它则不联网
+# ============================================================
+literatures:
+  - id: "XX01"
+    title: "示例文献标题"
+    url: "https://example.com/paper-1"
+    publisher: "示例机构"
+    date: "2025-01-01"
+    lit_type: "论文"
+    credibility: "A"
+    chapter: "01-遴选理由"
+    section: "1.1"
+    tags: ["示例"]
+  - id: "XX02"
+    title: "示例文献标题二"
+    url: "https://example.com/paper-2"
+    publisher: "示例机构"
+    date: "2025-06-01"
+    lit_type: "技术报告"
+    credibility: "A"
+    chapter: "02-技术内涵"
+    section: "2.1"
+    tags: ["示例"]
+  - id: "XX03"
+    title: "示例文献标题三"
+    url: "https://example.com/paper-3"
+    publisher: "示例机构"
+    date: "2025-09-01"
+    lit_type: "论文"
+    credibility: "A"
+    chapter: "03-最新进展"
+    section: "3.1"
+  - id: "XX04"
+    title: "示例文献标题四"
+    url: "https://example.com/paper-4"
+    publisher: "示例机构"
+    date: "2025-10-01"
+    lit_type: "行业报告"
+    credibility: "B"
+    chapter: "04-应用前景与价值"
+    section: "4.1"

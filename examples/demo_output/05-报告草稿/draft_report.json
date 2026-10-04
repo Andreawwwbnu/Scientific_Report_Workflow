@@ -1,0 +1,27 @@
+{
+  "chapters": {
+    "01": {
+      "chars": 58,
+      "hard": [],
+      "soft": [],
+      "prompt": "draft_chapter@3.0"
+    },
+    "02": {
+      "chars": 130,
+      "hard": [],
+      "soft": [],
+      "prompt": "draft_chapter@3.0"
+    },
+    "03": {
+      "chars": 63,
+      "hard": [],
+      "soft": [],
+      "prompt": "draft_chapter@3.0"
+    }
+  },
+  "frame": {
+    "hard": [],
+    "soft": []
+  },
+  "near_duplicates": []
+}

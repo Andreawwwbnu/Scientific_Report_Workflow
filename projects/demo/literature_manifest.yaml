@@ -1,0 +1,80 @@
+# 离线演示：虚构素材，用 local_file 指向 sources/，不联网
+literatures:
+- id: DM01
+  title: 演示素材A：向量检索要解决的问题
+  url: https://example.com/demo/01
+  local_file: sources/01.md
+  publisher: 演示数据（虚构）
+  author: 演示作者
+  date: '2026-01-01'
+  lit_type: 演示素材
+  credibility: 演示
+  chapter: 01-遴选理由
+  section: '1.1'
+  tags:
+  - 演示
+- id: DM02
+  title: 演示素材B：为什么需要近似检索
+  url: https://example.com/demo/02
+  local_file: sources/02.md
+  publisher: 演示数据（虚构）
+  author: 演示作者
+  date: '2026-01-02'
+  lit_type: 演示素材
+  credibility: 演示
+  chapter: 01-遴选理由
+  section: '1.1'
+  tags:
+  - 演示
+- id: DM03
+  title: 演示素材C：基于图的索引机理
+  url: https://example.com/demo/03
+  local_file: sources/03.md
+  publisher: 演示数据（虚构）
+  author: 演示作者
+  date: '2026-01-03'
+  lit_type: 演示素材
+  credibility: 演示
+  chapter: 02-技术内涵
+  section: '2.1'
+  tags:
+  - 演示
+- id: DM04
+  title: 演示素材D：乘积量化与索引压缩
+  url: https://example.com/demo/04
+  local_file: sources/04.md
+  publisher: 演示数据（虚构）
+  author: 演示作者
+  date: '2026-01-04'
+  lit_type: 演示素材
+  credibility: 演示
+  chapter: 02-技术内涵
+  section: '2.1'
+  tags:
+  - 演示
+- id: DM05
+  title: 演示素材E：评测指标与适用边界
+  url: https://example.com/demo/05
+  local_file: sources/05.md
+  publisher: 演示数据（虚构）
+  author: 演示作者
+  date: '2026-01-05'
+  lit_type: 演示素材
+  credibility: 演示
+  chapter: 02-技术内涵
+  section: '2.2'
+  tags:
+  - 演示
+- id: DM06
+  title: 演示素材F：典型应用场景
+  url: https://example.com/demo/06
+  local_file: sources/06.md
+  publisher: 演示数据（虚构）
+  author: 演示作者
+  date: '2026-01-06'
+  lit_type: 演示素材
+  credibility: 演示
+  chapter: 03-应用与趋势
+  section: '3.1'
+  tags:
+  - 演示

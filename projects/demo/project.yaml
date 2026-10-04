@@ -1,0 +1,109 @@
+# 离线演示专题：用虚构素材 + MockLLM 验证整条流水线（不联网、不需要 API Key）
+project:
+  slug: demo
+  name: 向量检索基础（离线演示专题）
+  report_title: 向量检索基础调研报告（离线演示）
+  version: v0.1
+  id_prefix: DM
+  theme: 向量检索;ANN;HNSW;乘积量化
+  audience: 工程师
+  root: output
+llm:
+  provider: mock
+  api_key_env: DEEPSEEK_API_KEY
+  base_url_env: DEEPSEEK_BASE_URL
+  default_base_url: https://api.deepseek.com
+  structure_model: deepseek-chat
+  analyze_model: deepseek-chat
+  draft_model: deepseek-chat
+  min_section_chars: 20
+  max_section_chars: 800
+  concurrency: 2
+  cache: false
+retrieval:
+  chunk_chars: 300
+  top_k: 6
+  per_source_max: 2
+  always_include_head: true
+  max_items_per_section: 6
+word_count:
+  body_min: 300
+  body_max: 1500
+  abstract_min: 60
+  abstract_max: 250
+  conclusion_min: 40
+  conclusion_max: 200
+  keywords_min: 5
+  keywords_max: 7
+draft:
+  persona: 专业技术情报分析师与报告撰稿人
+  style_rules: []
+  max_paragraph_chars: 400
+  chapter_tolerance: 0.95
+  max_rewrites: 1
+word:
+  font_cn: 仿宋
+  font_en: Times New Roman
+  size_title_pt: 22
+  size_heading_pt: 16
+  size_body_pt: 16
+  size_citation_pt: 12
+  line_spacing: 1.5
+  toc: false
+  page_numbers: true
+report:
+  chapters:
+  - id: '01'
+    heading: 一、遴选理由
+    source_chapters:
+    - '01'
+    weight: 2
+    no_subheadings: true
+    synthesis: true
+    write_guide: 归纳性章节：说明为何值得关注。
+  - id: '02'
+    heading: 二、技术内涵
+    source_chapters:
+    - '02'
+    weight: 4
+    write_guide: 先机理，后指标与边界。
+    sections:
+    - 2.1 概念与检索机理
+    - 2.2 性能指标与边界
+  - id: '03'
+    heading: 三、应用与趋势
+    source_chapters:
+    - '03'
+    weight: 2
+    write_guide: 只写素材中出现的应用。
+    sections:
+    - 3.1 典型应用场景
+chapters:
+- id: '01'
+  name: 一、遴选理由
+  folder: 01-遴选理由
+  sections:
+  - id: '1.1'
+    name: 技术特征与核心价值
+    extract_rule: 聚焦向量检索要解决的问题与近似检索的价值，不展开具体索引实现。
+    analyze_task: 归纳向量检索的技术特征，并说明近似检索相对暴力检索的价值与代价。
+- id: '02'
+  name: 二、技术内涵
+  folder: 02-技术内涵
+  sections:
+  - id: '2.1'
+    name: 概念与检索机理
+    extract_rule: 提取基于图的索引、HNSW 与乘积量化的机理证据。
+    analyze_task: 说明图索引与乘积量化的工作机理及其关键参数的作用。
+  - id: '2.2'
+    name: 性能指标与边界
+    extract_rule: 聚焦召回率、延迟等指标及适用边界（DM05）。
+    analyze_task: 梳理评测指标体系，说明指标间的权衡与适用边界。
+- id: '03'
+  name: 三、应用与趋势
+  folder: 03-应用与趋势
+  sections:
+  - id: '3.1'
+    name: 典型应用场景
+    extract_rule: 提取素材中出现的典型应用场景。
+    analyze_task: 归纳典型应用场景及其对检索能力的要求。

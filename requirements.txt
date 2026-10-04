@@ -1,10 +1,10 @@
-# 阶段1 抓取
+# 运行
+PyYAML>=6.0
+python-docx>=1.1
 requests>=2.31
 beautifulsoup4>=4.12
 trafilatura>=1.8
-# 阶段2-4 LLM（OpenAI 兼容接口，DeepSeek 直接可用）
 openai>=1.30
 python-dotenv>=1.0
-# 配置 / 文档
-PyYAML>=6.0
-python-docx>=1.1
+# 可选：抓取 PDF（arXiv 无 HTML 版时的全文回退、本地 PDF）
+pypdf>=4.0
