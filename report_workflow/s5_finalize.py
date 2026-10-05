@@ -120,7 +120,7 @@ def run(cfg: WorkflowConfig, **_) -> dict:
             "length": {"abstract": lb["abstract"], "body": lb["body"], "conclusion": lb["conclusion"]},
             "references": len(order)}
     final = with_frontmatter(meta, main + "\n\n## 参考文献\n\n" + refs)
-    cfg.final_md_path.write_text(final, encoding="utf-8")
+    cfg.write_text_safe(cfg.final_md_path, final)
 
     print(f"📄 终稿：{cfg.final_md_path}")
     print(f"   字数：摘要 {lb['abstract']}｜正文 {lb['body']}｜结论 {lb['conclusion']}｜参考文献 {len(order)} 条")

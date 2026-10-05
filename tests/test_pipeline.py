@@ -60,18 +60,50 @@ def test_draft_strips_illegal_citations(demo_cfg):
     assert res["ok"] is True
 
 
-class BadHeadingLLM(MockLLM):
+class RenamedHeadingLLM(MockLLM):
+    """模型把标题改成了近义说法：数量/层级没变 → 应被确定性还原，而不是让整条流水线失败。"""
+
     def _draft_chapter(self, user: str) -> str:
         return super()._draft_chapter(user).replace("## 二、技术内涵", "## 二、被改过的标题")
 
 
-def test_draft_gate_fails_when_headings_wrong(demo_cfg):
+class MissingHeadingLLM(MockLLM):
+    """模型漏写了一个小节标题：无法安全还原 → 必须被门禁拦下。"""
+
+    def _draft_chapter(self, user: str) -> str:
+        return super()._draft_chapter(user).replace("### 2.2 性能指标与边界\n", "")
+
+
+def _prep(cfg):
     from report_workflow import s1_fetch, s2_structure, s3_analyze
-    s1_fetch.run(demo_cfg)
-    s2_structure.run(demo_cfg, MockLLM())
-    s3_analyze.run(demo_cfg, MockLLM())
-    res = s4_draft.run(demo_cfg, BadHeadingLLM())
+    s1_fetch.run(cfg)
+    s2_structure.run(cfg, MockLLM())
+    s3_analyze.run(cfg, MockLLM())
+
+
+def test_draft_autofixes_renamed_headings(demo_cfg):
+    _prep(demo_cfg)
+    res = s4_draft.run(demo_cfg, RenamedHeadingLLM())
+    assert res["ok"] is True
+    assert "## 二、技术内涵" in demo_cfg.draft_path.read_text(encoding="utf-8")
+
+
+def test_draft_gate_fails_when_heading_missing(demo_cfg):
+    _prep(demo_cfg)
+    res = s4_draft.run(demo_cfg, MissingHeadingLLM())
     assert res["ok"] is False and any("标题" in h for h in res["hard"])
+
+
+def test_overwrite_backs_up_manual_edits(demo_run):
+    cfg, llm, _ = demo_run
+    ch = cfg.chapter_by_id("01")
+    p = cfg.structured_path(ch)
+    p.write_text(p.read_text(encoding="utf-8") + "\n手工新增的证据MARK", encoding="utf-8")
+    from report_workflow import s2_structure
+    s2_structure.run(cfg, llm)                                   # 重跑阶段2会覆盖该文件
+    assert "手工新增的证据MARK" not in p.read_text(encoding="utf-8")
+    backups = list((cfg.meta_dir / "backup").rglob(p.name))
+    assert backups and "手工新增的证据MARK" in backups[0].read_text(encoding="utf-8")
 
 
 def test_only_chapter_regenerates_selected(demo_run):

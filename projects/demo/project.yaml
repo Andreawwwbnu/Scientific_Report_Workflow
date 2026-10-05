@@ -26,6 +26,7 @@ retrieval:
   per_source_max: 2
   always_include_head: true
   max_items_per_section: 6
+  query_expansion: none
 word_count:
   body_min: 300
   body_max: 1500

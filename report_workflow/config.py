@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
+from datetime import datetime
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -30,7 +32,8 @@ DIR_FINAL = "06-终稿与参考文献"
 DIR_META = ".workflow"          # 缓存、运行记录
 
 DRAFT_FILENAME = "报告草稿_完整版.md"
-SKIP_MARK = "无充分证据"        # 阶段 3 对无证据小节写入的标记关键词
+SKIP_MARK = "无充分证据"
+_RUN_STAMP = datetime.now().strftime("%Y%m%d-%H%M%S")        # 阶段 3 对无证据小节写入的标记关键词
 
 
 def load_yaml(path: Path) -> dict:
@@ -113,7 +116,7 @@ class WorkflowConfig:
     @property
     def retrieval_cfg(self) -> dict:
         d = {"chunk_chars": 700, "top_k": 8, "per_source_max": 3, "always_include_head": True,
-             "max_items_per_section": 8}
+             "max_items_per_section": 8, "query_expansion": "llm"}
         d.update(self.project.get("retrieval", {}) or {})
         return d
 
@@ -301,6 +304,24 @@ class WorkflowConfig:
     def review_report_path(self) -> Path:
         return self.final_dir / "审稿意见.md"
 
+    def write_text_safe(self, path: Path, text: str) -> None:
+        """写文件；若已存在且内容不同，先把旧版备份到 .workflow/backup/<时间戳>/，避免冲掉你的手工修改。"""
+        path = Path(path)
+        if path.exists():
+            try:
+                old = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                old = None
+            if old is not None and old != text:
+                try:
+                    rel = path.resolve().relative_to(self.root.resolve())
+                except ValueError:
+                    rel = Path(path.name)
+                dest = self.meta_dir / "backup" / _RUN_STAMP / rel
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(path, dest)
+        path.write_text(text, encoding="utf-8")
+
     def resolve_project_path(self, p: str) -> Path:
         path = Path(p).expanduser()
         return path if path.is_absolute() else (self.project_dir / path)
@@ -452,6 +473,8 @@ def validate_config(cfg: WorkflowConfig) -> Tuple[List[str], List[str]]:
             for k in ("id", "name", "extract_rule", "analyze_task"):
                 if not s.get(k):
                     errors.append(f"section {s.get('id', '?')} 缺少 {k}")
+            if "keywords" in s and not isinstance(s["keywords"], list):
+                errors.append(f"section {s['id']} 的 keywords 必须是列表")
             ids_in_rules |= set(re.findall(rf"{re.escape(prefix)}\d+", s.get("extract_rule", "")))
             if not any(e["section"] == s["id"] for e in cfg.all_entries):
                 warns.append(f"小节 {s['id']} 没有任何文献，将被判定为“无充分证据”")

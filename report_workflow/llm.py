@@ -152,6 +152,9 @@ class MockLLM(BaseLLM):
         return fn(user)
 
     # ----- 阶段 2 -----
+    def _expand_query(self, user: str) -> str:
+        return json.dumps({"keywords": []})
+
     def _extract(self, user: str) -> str:
         chunks = self._CHUNK.findall(user)
         m = re.search(r"最多输出要点数：(\d+)", user)

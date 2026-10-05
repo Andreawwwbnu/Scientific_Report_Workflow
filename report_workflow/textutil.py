@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Dict, List, Optional, Tuple
 
 import yaml
@@ -201,7 +202,7 @@ def number_universe(text: str) -> set:
 
 def norm_for_match(text: str) -> str:
     """用于“原文子串”比对：去掉全部空白与常见排版符号，统一全半角引号/标点。"""
-    text = text.replace("\u00a0", " ")
+    text = unicodedata.normalize("NFKC", text)       # 全半角、连字（ﬁ→fi）统一
     text = re.sub(r"\s+", "", text)
     trans = {"“": '"', "”": '"', "‘": "'", "’": "'", "—": "-", "–": "-", "－": "-"}
     return "".join(trans.get(ch, ch) for ch in text).lower()

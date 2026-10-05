@@ -26,6 +26,13 @@
 - Word：真实 Title/Heading 样式（导航窗格、目录）、页码、可选模板；参考文献悬挂缩进。
 - 离线 `demo` 专题 + `MockLLM`；pytest 离线测试；GitHub Actions；`pyproject.toml`；LICENSE；README 重写；旧审计记录移入 `docs/history/`。
 
+### 代码审计中发现并修复的问题
+- **跨语言检索失效（影响最大）**：中文查询词在 BM25 里命中不了英文原文，检索会退化成只取文首几块。现为：小节可配 `keywords`；`retrieval.query_expansion: llm` 为每个小节生成双语检索词；仍无命中时按来源等距抽样兜底，并提示“检索信号弱的小节”。附回归测试。
+- **PDF 断词与连字**：PDF 抽取的行尾连字符（`quanti-\nzation`）与连字（ﬁ）会让合法引文被判“非原文逐字”。现已在入库时去连字符，并对引文比对做 NFKC 归一化。
+- **标题漂移**：模型把标题改成近义说法会让整章硬失败。现数量与层级一致时按位置确定性还原；真正缺标题仍由门禁拦下。
+- **覆盖丢失手工修改**：阶段 2/3/4/5 覆盖前自动备份旧版到 `.workflow/backup/`。
+- CI：`tests/conftest.py` 的未使用导入已清理。
+
 ### 不兼容变更
 - `config/` → `projects/<名称>/`；`report_blueprint` → `report.chapters`；`fetch.*_keep_head/tail` 移除（由 `retrieval.*` 取代）。
 - 阶段 2 证据文件格式变化（每条带原文摘录）；v2 产物需重跑阶段 2 起。

@@ -41,6 +41,7 @@ retrieval:
   per_source_max: 3
   always_include_head: true
   max_items_per_section: 8
+  query_expansion: llm
 word_count:
   body_min: 3500
   body_max: 3900
