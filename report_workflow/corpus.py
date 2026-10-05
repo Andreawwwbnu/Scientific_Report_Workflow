@@ -43,7 +43,9 @@ def clean_body(body: str) -> str:
         if s in ("## 原始链接", "## PDF") or re.fullmatch(r"https?://\S+", s):
             continue
         kept.append(ln)
-    return "\n".join(kept).strip()
+    text = "\n".join(kept).strip()
+    # PDF 抽取常见的“行尾连字符断词”：quanti-\nzation → quantization（仅小写字母之间，避免误伤复合词）
+    return re.sub(r"(?<=[a-z])-\n(?=[a-z])", "", text)
 
 
 def is_placeholder(body: str, min_chars: int = 200) -> bool:
@@ -202,23 +204,35 @@ class Corpus:
             s += idf * f * (k1 + 1) / (f + k1 * (1 - b + b * len(c.tokens) / self._avg_len))
         return s
 
-    def search(self, query: str, source_ids: Sequence[str], k: int = 8,
-               per_source_max: int = 3, include_head: bool = True) -> List[Chunk]:
+    @staticmethod
+    def _spread(chunks: List[Chunk], m: int) -> List[Chunk]:
+        """等距抽样（跳过文首块），用于没有检索信号时覆盖全文，而不是只取文首。"""
+        n = len(chunks)
+        if n <= 1:
+            return []
+        pos = [min(max(int((j + 1) * n / (m + 1)), 1), n - 1) for j in range(max(m, 1))]
+        order = list(dict.fromkeys(pos)) + [i for i in range(1, n) if i not in pos]
+        return [chunks[i] for i in order]
+
+    def search_with_info(self, query: str, source_ids: Sequence[str], k: int = 8,
+                         per_source_max: int = 3, include_head: bool = True):
+        """返回 (chunks, info)。info['weak']=True 表示没有任何块命中查询词（常见原因：
+        中文查询词 vs 英文原文），此时按来源等距抽样兜底，并提示配置 keywords / 开启查询扩展。"""
         sids = [s for s in dict.fromkeys(self.cfg.canonical_id(x) for x in source_ids) if s in self.docs]
         cands = [c for s in sids for c in self.docs[s].chunks]
         if not cands:
-            return []
+            return [], {"matched": 0, "selected": 0, "weak": False}
         q = tokenize(query)
         score = {c.id: self._score(q, c) for c in cands}
         selected: List[Chunk] = []
         per: Dict[str, int] = {}
         if include_head:
             for s in sids[:max(1, k // 2)]:
-                h = self.docs[s].chunks[0]
-                selected.append(h)
+                selected.append(self.docs[s].chunks[0])
                 per[s] = 1
         chosen = {c.id for c in selected}
-        for c in sorted(cands, key=lambda c: (-score[c.id], c.source, c.idx)):
+        matched = 0
+        for c in sorted((c for c in cands if score[c.id] > 0), key=lambda c: (-score[c.id], c.source, c.idx)):
             if len(selected) >= k:
                 break
             if c.id in chosen or per.get(c.source, 0) >= per_source_max:
@@ -226,8 +240,31 @@ class Corpus:
             selected.append(c)
             chosen.add(c.id)
             per[c.source] = per.get(c.source, 0) + 1
+            matched += 1
+        if len(selected) < k:                       # 兜底：轮流从各来源取等距抽样块
+            spreads = {s: self._spread(self.docs[s].chunks, per_source_max) for s in sids}
+            progressed = True
+            while len(selected) < k and progressed:
+                progressed = False
+                for s in sids:
+                    if len(selected) >= k:
+                        break
+                    if per.get(s, 0) >= per_source_max:
+                        continue
+                    nxt = next((c for c in spreads[s] if c.id not in chosen), None)
+                    if nxt is None:
+                        continue
+                    selected.append(nxt)
+                    chosen.add(nxt.id)
+                    per[s] = per.get(s, 0) + 1
+                    progressed = True
         order = {s: i for i, s in enumerate(sids)}
-        return sorted(selected, key=lambda c: (order.get(c.source, 99), c.idx))
+        out = sorted(selected, key=lambda c: (order.get(c.source, 99), c.idx))
+        return out, {"matched": matched, "selected": len(out), "weak": matched == 0}
+
+    def search(self, query: str, source_ids: Sequence[str], k: int = 8,
+               per_source_max: int = 3, include_head: bool = True) -> List[Chunk]:
+        return self.search_with_info(query, source_ids, k, per_source_max, include_head)[0]
 
     def render_chunks(self, chunks: Sequence[Chunk]) -> str:
         parts = []

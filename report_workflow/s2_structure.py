@@ -32,6 +32,28 @@ def sources_for_section(cfg: WorkflowConfig, sec: dict, corpus: Corpus) -> List[
     return [i for i in dict.fromkeys(ids) if corpus.has(i)]
 
 
+def expand_query(sec: dict, sids: List[str], cfg: WorkflowConfig, corpus: Corpus, llm: BaseLLM) -> List[str]:
+    """检索关键词 = 小节配置里手写的 keywords + （可选）LLM 生成的双语关键词。
+
+    为什么需要：抽取规则通常是中文，而原文常是英文，纯中文查询词在 BM25 里根本命中不了英文块。
+    扩展失败不影响主流程，退回基础查询。"""
+    kws = [str(x) for x in (sec.get("keywords") or [])]
+    if cfg.retrieval_cfg.get("query_expansion", "llm") == "llm":
+        titles = "；".join(corpus.docs[s].title for s in sids)[:400]
+        p = render("expand_query", cfg.prompts_override_dir, topic=cfg.name, section_id=sec["id"],
+                   section_name=sec["name"], extract_rule=sec.get("extract_rule", ""),
+                   analyze_task=sec.get("analyze_task", ""), source_titles=titles)
+        try:
+            text = llm.chat(task="expand_query", model=cfg.llm_cfg["structure_model"], system=p.system,
+                            user=p.user, max_tokens=600, temperature=0.0)
+            data = extract_json(text)
+            extra = data.get("keywords", []) if isinstance(data, dict) else data
+            kws += [str(x) for x in extra if isinstance(x, (str, int, float))][:20]
+        except Exception:  # noqa: BLE001
+            pass
+    return kws
+
+
 def verify_items(raw_items: Sequence[dict], chunks: Sequence[Chunk], allowed: Set[str],
                  cfg: WorkflowConfig, max_items: int) -> Tuple[List[Evidence], List[str]]:
     """逐条校验，返回 (合格证据, 丢弃原因列表)。"""
@@ -89,10 +111,13 @@ def extract_section(chapter: dict, sec: dict, cfg: WorkflowConfig, corpus: Corpu
     rcfg = cfg.retrieval_cfg
     sids = sources_for_section(cfg, sec, corpus)
     if not sids:
-        return {"items": [], "dropped": [], "note": "无可用来源正文", "prompt": ""}
-    query = f"{sec['name']} {sec.get('extract_rule', '')} {sec.get('analyze_task', '')}"
-    chunks = corpus.search(query, sids, k=int(rcfg["top_k"]), per_source_max=int(rcfg["per_source_max"]),
-                           include_head=bool(rcfg["always_include_head"]))
+        return {"items": [], "dropped": [], "note": "无可用来源正文", "prompt": "",
+                "retrieval": {"matched": 0, "selected": 0, "weak": False}}
+    kws = expand_query(sec, sids, cfg, corpus, llm)
+    query = f"{sec['name']} {sec.get('extract_rule', '')} {sec.get('analyze_task', '')} {' '.join(kws)}"
+    chunks, info = corpus.search_with_info(query, sids, k=int(rcfg["top_k"]),
+                                           per_source_max=int(rcfg["per_source_max"]),
+                                           include_head=bool(rcfg["always_include_head"]))
     allowed = set(sids)
     max_items = int(rcfg["max_items_per_section"])
     llm_cfg = cfg.llm_cfg
@@ -126,7 +151,8 @@ def extract_section(chapter: dict, sec: dict, cfg: WorkflowConfig, corpus: Corpu
                         + "\n请重新输出：quote 必须逐字复制自 chunk，claim 的数字必须与 quote 一致。</feedback>")
             continue
         break
-    return {"items": items, "dropped": dropped, "sources": sids, "chunks": len(chunks), "prompt": tag}
+    return {"items": items, "dropped": dropped, "sources": sids, "chunks": len(chunks), "prompt": tag,
+            "retrieval": info, "keywords": kws}
 
 
 def _chapter_markdown(chapter: dict, results: Dict[str, dict], cfg: WorkflowConfig, corpus: Corpus,
@@ -176,11 +202,16 @@ def run(cfg: WorkflowConfig, llm: BaseLLM, only_chapters: Optional[Set[str]] = N
         mark = "✅" if res["items"] else "⚪"
         print(f"  {mark} {sec['id']} {sec['name']}：保留 {len(res['items'])} 条，丢弃 {len(res['dropped'])} 条")
 
+    weak = [sec["id"] for (ch, sec), (ok, res) in zip(jobs, outs)
+            if ok and res.get("retrieval", {}).get("weak")]
+    if weak:
+        print(f"⚠️ 检索信号弱的小节：{', '.join(weak)}——原文与检索词语言/用词可能不一致，"
+              "建议在这些小节配置 keywords，或确认 retrieval.query_expansion: llm")
     empty_chapters = []
     for ch in chapters:
         results = per_chapter[ch["id"]]
         tag = next((r.get("prompt") for r in results.values() if r.get("prompt")), "")
-        cfg.structured_path(ch).write_text(_chapter_markdown(ch, results, cfg, corpus, tag), encoding="utf-8")
+        cfg.write_text_safe(cfg.structured_path(ch), _chapter_markdown(ch, results, cfg, corpus, tag))
         if not any(r["items"] for r in results.values()):
             empty_chapters.append(ch["id"])
     print("\n" + "=" * 72)
@@ -190,4 +221,4 @@ def run(cfg: WorkflowConfig, llm: BaseLLM, only_chapters: Optional[Set[str]] = N
     print("⚠️ 建议人工抽查：定义、数字、章节归属（证据文件里每条都带原文摘录，核对很快）")
     print("=" * 72)
     return {"ok": not empty_chapters, "kept": kept_total, "dropped": dropped_total,
-            "empty_chapters": empty_chapters, "failed_sections": failed_sections}
+            "empty_chapters": empty_chapters, "failed_sections": failed_sections, "weak_retrieval": weak}

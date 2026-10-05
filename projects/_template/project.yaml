@@ -49,6 +49,7 @@ retrieval:
   per_source_max: 3                           # 每个来源最多取几块
   always_include_head: true                   # 每个来源保底带文首块（定义通常在文首）
   max_items_per_section: 8                    # 每个小节最多保留几条证据
+  query_expansion: llm                        # llm：为每个小节生成双语检索关键词（原文常是英文而规则是中文）；none：关闭
 
 # ---------------- 篇幅预算（中文字符口径，不含标题与引用角标）----------------
 word_count:
@@ -143,6 +144,7 @@ chapters:
         name: "技术特征与核心价值"
         extract_rule: "只提取……；不展开……"
         analyze_task: "归纳……，说明……"
+        keywords: ["可选：手写检索关键词", "原文若是英文，写英文术语与缩写"]   # 与 LLM 扩展的关键词合并使用
   - id: "02"
     name: "二、技术内涵"
     folder: "02-技术内涵"

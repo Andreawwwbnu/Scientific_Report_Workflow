@@ -159,7 +159,7 @@ def run(cfg: WorkflowConfig, llm: BaseLLM, only_chapters: Optional[Set[str]] = N
         body = (f"# {ch['name']}·分析结论\n"
                 f"> 分析依据：`{cfg.structured_path(ch).name}`；结论均由证据推导，未引入外部知识。\n\n"
                 + "\n".join(results[ch["id"]][s["id"]] for s in ch["sections"]))
-        cfg.analysis_path(ch).write_text(with_frontmatter(meta, body), encoding="utf-8")
+        cfg.write_text_safe(cfg.analysis_path(ch), with_frontmatter(meta, body))
 
     print("\n" + "=" * 72)
     print(f"🏁 成功 {ok_n}｜跳过 {skip_n}｜失败 {fail_n}；" + llm.usage.summary_line())

@@ -89,6 +89,25 @@ def _strip_illegal(text: str, allowed: Set[str], prefix: str) -> Tuple[str, List
     return out, removed
 
 
+def fix_headings(text: str, rc: ReportChapter) -> str:
+    """模型常把“## 二、技术内涵”改写成近义标题。若标题数量与层级都对得上，按位置确定性地还原。"""
+    required = rc.headings
+    lines = text.splitlines()
+    idx = [i for i, ln in enumerate(lines) if ln.lstrip().startswith("#")]
+    found = [lines[i].strip() for i in idx]
+    if found == required or len(found) != len(required):
+        return text
+
+    def level(h: str) -> int:
+        return len(h) - len(h.lstrip("#"))
+
+    if all(level(a) == level(b) for a, b in zip(found, required)):
+        for i, req in zip(idx, required):
+            lines[i] = req
+        return "\n".join(lines)
+    return text
+
+
 def check_chapter(text: str, rc: ReportChapter, cfg: WorkflowConfig, allowed: Set[str]) -> Tuple[List[str], List[str]]:
     """返回 (硬问题, 软问题)。硬问题：标题结构、非法引用；软问题：篇幅、段落过长。"""
     hard, soft = [], []
@@ -144,7 +163,7 @@ def generate_chapter(rc: ReportChapter, cfg: WorkflowConfig, llm: BaseLLM, input
         raw = llm.chat(task="draft_chapter", model=lc["draft_model"], system=p.system, user=p.user,
                        max_tokens=int(lc.get("max_tokens_draft", 8192)),
                        temperature=float(lc.get("temperature_draft", 0.3)))
-        text = _clean_model_text(raw, cfg)
+        text = fix_headings(_clean_model_text(raw, cfg), rc)
         hard, soft = check_chapter(text, rc, cfg, allowed)
         n = visible_length(_body_only(text))
         key = (len(hard), 0 if lo <= n <= hi else abs(n - (lo + hi) // 2))
@@ -293,7 +312,7 @@ def run(cfg: WorkflowConfig, llm: BaseLLM, only_chapters: Optional[Set[str]] = N
         if r is None:
             continue
         if r["text"]:
-            cfg.draft_chapter_path(rc).write_text(r["text"], encoding="utf-8")
+            cfg.write_text_safe(cfg.draft_chapter_path(rc), r["text"])
         lo, hi = cfg.chapter_char_range(rc)
         flag = "❌" if r["hard"] else ("⚠️" if r["soft"] else "✅")
         print(f"  {flag} {rc.heading}：{r['chars']} 字（目标 {lo}–{hi}）"
@@ -305,12 +324,12 @@ def run(cfg: WorkflowConfig, llm: BaseLLM, only_chapters: Optional[Set[str]] = N
         return {"ok": False, "reason": "chapter_failed", "chapters": {k: _brief(v) for k, v in results.items()}}
 
     frame = generate_frame(cfg, llm, [texts[rc.id] for rc in rcs])
-    cfg.draft_frame_path.write_text(frame["text"], encoding="utf-8")
+    cfg.write_text_safe(cfg.draft_frame_path, frame["text"])
     fflag = "❌" if frame["hard"] else ("⚠️" if frame["soft"] else "✅")
     print(f"  {fflag} 摘要/关键词/结论" + (f"｜{'；'.join(frame['hard'] + frame['soft'])[:90]}" if (frame["hard"] or frame["soft"]) else ""))
 
     draft = assemble(cfg, texts, frame["parts"])
-    cfg.draft_path.write_text(draft, encoding="utf-8")
+    cfg.write_text_safe(cfg.draft_path, draft)
 
     # 跨章近重复
     sents = [(rc.id, s) for rc in rcs for s in split_sentences(_body_only(texts[rc.id]), 20)]
